@@ -31,7 +31,7 @@ tension with itself. One line each, newest phase last.
 
 ### Design tokens and accessibility
 
-- **Two text tiers were added: `--ink-500` (#7B8AA1) and `--proof-ink` (#5A8CFF).** The specified `--ink-600` (2.8:1) and `--proof` (4.2:1) do not clear 4.5:1 as small text on `--void`, and the accessibility floor is stated as a functional requirement. The original tokens are unchanged and still carry rules, borders, fills and large type; only small text uses the tiers. Same hue, same meaning, contrast that passes. **This changes the palette and is flagged for approval.**
+- **Two text tiers were added: `--ink-500` (#7B8AA1) and `--proof-ink` (#5A8CFF).** The specified `--ink-600` (2.8:1) and `--proof` (4.2:1) do not clear 4.5:1 as small text on `--void`, and the accessibility floor is stated as a functional requirement. The original tokens are unchanged and still carry rules, borders, fills and large type; only small text uses the tiers. Same hue, same meaning, contrast that passes. Approved at the Phase 1 checkpoint.
 - Measured result: zero WCAG AA text-contrast failures across all six pages.
 - `REFUSE` is the one verdict chip with no accent colour. It uses `--ink-400` on `--slate-800`, because colouring an honest "I cannot answer" red would classify it as a failure, and red is reserved for refuted and denied.
 - A passing predicate renders in `--proof`, not `--gate`. Green is Sentinel's identity and the enforcement path; blue is "this was proven or allowed", which is what a passing predicate is.
@@ -45,7 +45,7 @@ tension with itself. One line each, newest phase last.
 - `replay ✓` is earned: the digest is derived twice from the canonical form and compared. It is not a hardcoded tick.
 - The ledger sequence is derived from the decision digest. In the product it is a position in an append-only log; here determinism matters more than realism, so it is a pure function of the decision.
 - The verdict block lists failing predicates in rule evaluation order (R-207 then R-311). The blueprint's sample output shows them in the other order while naming R-207 as the deciding rule; evaluation order was chosen because the pack's ordering is fixed.
-- **Open conflict, needs a decision.** The blueprint says setting `oms_status` to "in transit" must flip the verdict to ALLOW. With the rules as specified, R-207 still fails at the default 22 minutes of evidence age, so the verdict stays DENY. The rules are implemented exactly as written and the conflict is unresolved. See the checkpoint note.
+- **Resolved at the Phase 1 checkpoint: the rules stay literal.** The blueprint says setting `oms_status` to "in transit" must flip the verdict to ALLOW, but R-207 still fails at the default 22 minutes of evidence age, so it stays DENY. Confirmed that R-207 remains a hard rule: reaching ALLOW requires both a non-contradicting source and fresh evidence, which is a truer demonstration than a single control flipping the outcome.
 - `window.kensara` exposes `canonicalJson`, `sha256Hex`, `evaluate` and the default input, so a visitor can reproduce any hash the demo shows.
 
 ### 3D scenes
