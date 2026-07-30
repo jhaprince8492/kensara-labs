@@ -1,0 +1,37 @@
+{
+  "name": "kensara-labs-site",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "bundle": "node scripts/check-bundle.mjs",
+    "check": "pnpm typecheck && pnpm lint && pnpm build && pnpm bundle"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.0",
+    "@react-three/fiber": "^9.3.0",
+    "gsap": "^3.13.0",
+    "motion": "^12.23.0",
+    "next": "15.5.4",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@tailwindcss/postcss": "^4.1.13",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@types/three": "^0.185.1",
+    "eslint": "^9.18.0",
+    "eslint-config-next": "15.5.4",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.7.3"
+  }
+}
