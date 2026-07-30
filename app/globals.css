@@ -1,0 +1,192 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+   Design tokens.
+   Colour is data on this site. Blue means proven or allowed. Green means the
+   gate is enforcing. Amber means a human is required. Red means refuted or
+   denied and is used for nothing else, ever. When something needs separation
+   rather than meaning, it gets --hairline.
+   --------------------------------------------------------------------------- */
+
+@theme {
+  /* ground & surface */
+  --color-void: #05070b;
+  --color-slate-900: #0c1118;
+  --color-slate-800: #141b25;
+  --color-hairline: #1f2a38;
+
+  /* text */
+  --color-ink-100: #e8ecf2;
+  --color-ink-400: #8a98ac;
+  --color-ink-600: #4e5b6e;
+
+  /* Text tiers.
+     --ink-600 (2.8:1) and --proof (4.2:1) are the specified tokens and stay
+     exactly as specified for rules, borders, fills and large type. Neither
+     clears 4.5:1 as small text on this ground, and the accessibility floor is a
+     functional requirement here, so small text uses these two tiers instead:
+     same hue, same meaning, contrast that passes.
+       --ink-500    5.4:1 on --void   (captions, eyebrows)
+       --proof-ink  5.9:1 on --void   (mono evidence, links, button labels) */
+  --color-ink-500: #7b8aa1;
+  --color-proof-ink: #5a8cff;
+
+  /* semantic accents */
+  --color-proof: #2f6bff;
+  --color-gate: #22c39a;
+  --color-hold: #e0a22a;
+  --color-refute: #e2483f;
+
+  /* typefaces */
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+
+  /* type scale: 12 / 14 / 17 / 21 / 28 / 40 / 60 / 88 */
+  --text-12: 0.75rem;
+  --text-12--line-height: 1.4;
+  --text-14: 0.875rem;
+  --text-14--line-height: 1.5;
+  --text-17: 1.0625rem;
+  --text-17--line-height: 1.65;
+  --text-21: 1.3125rem;
+  --text-21--line-height: 1.5;
+  --text-28: 1.75rem;
+  --text-28--line-height: 1.3;
+  --text-40: 2.5rem;
+  --text-40--line-height: 1.16;
+  --text-60: 3.75rem;
+  --text-60--line-height: 1.08;
+  --text-88: 5.5rem;
+  --text-88--line-height: 1.02;
+
+  /* motion */
+  --ease-reveal: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Raw aliases so non-Tailwind consumers (canvas, inline styles, the 3D scenes)
+   can read the exact token names from the specification. */
+:root {
+  --void: #05070b;
+  --slate-900: #0c1118;
+  --slate-800: #141b25;
+  --hairline: #1f2a38;
+  --ink-100: #e8ecf2;
+  --ink-400: #8a98ac;
+  --ink-600: #4e5b6e;
+  --ink-500: #7b8aa1;
+  --proof: #2f6bff;
+  --proof-ink: #5a8cff;
+  --gate: #22c39a;
+  --hold: #e0a22a;
+  --refute: #e2483f;
+
+  --measure: 68ch;
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    background-color: var(--void);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--void);
+    color: var(--color-ink-100);
+    font-family: var(--font-sans);
+    font-size: var(--text-17);
+    line-height: 1.65;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  /* Visible focus on the dark ground. Non-negotiable. */
+  :focus-visible {
+    outline: 2px solid var(--color-proof);
+    outline-offset: 2px;
+    border-radius: 1px;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-proof) 34%, transparent);
+    color: var(--color-ink-100);
+  }
+
+  /* Scrollbar reads as instrument chrome, not as decoration. */
+  * {
+    scrollbar-color: var(--color-hairline) transparent;
+    scrollbar-width: thin;
+  }
+}
+
+@layer utilities {
+  .measure {
+    max-width: var(--measure);
+  }
+
+  /* Eyebrow: mono, uppercase, 12px, 0.14em tracking, --ink-600.
+     Only ever used where the label states a real classification. */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--text-12);
+    line-height: 1.4;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-500);
+  }
+
+  /* Every verifiable thing on the site is set in mono. */
+  .mono {
+    font-family: var(--font-mono);
+    font-variant-ligatures: none;
+    font-feature-settings: 'tnum' 1;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Motion. 12px rise, 240ms, fires once, never re-triggers.
+   No parallax on text, ever.
+   --------------------------------------------------------------------------- */
+
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+  transition:
+    opacity 240ms var(--ease-reveal),
+    transform 240ms var(--ease-reveal);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal[data-revealed='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
