@@ -18,6 +18,8 @@ export interface GraphNode {
   id: string;
   x: number;
   y: number;
+  /** Depth. The still ignores it; the live scene rotates the graph around it. */
+  z: number;
   r: number;
   core: boolean;
 }
@@ -56,6 +58,7 @@ export function buildGraph(width = 900, height = 560) {
       id: `R-${String(Math.floor(next() * 9000) + 100).padStart(4, '0')}`,
       x: cx + Math.cos(angle) * (ring + jitter) * width * 0.44,
       y: cy + Math.sin(angle) * (ring + jitter) * height * 0.44,
+      z: (next() - 0.5) * (ring + jitter) * height * 0.7,
       r: 1.6 + next() * 1.4,
       core: false,
     });
@@ -69,6 +72,7 @@ export function buildGraph(width = 900, height = 560) {
     const angle = (slot / coreIndices.length) * Math.PI * 2 + 0.4;
     node.x = cx + Math.cos(angle) * width * 0.085;
     node.y = cy + Math.sin(angle) * height * 0.11;
+    node.z = Math.cos(angle * 1.7) * height * 0.05;
     node.r = 4.2;
     node.core = true;
     node.id = CORE_IDS[slot] ?? node.id;
