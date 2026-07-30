@@ -1,0 +1,77 @@
+There are two ways to put a policy check in front of an agent, and they look almost identical on an architecture diagram. One of them holds under an adversary. The other holds under a well-behaved agent, which is not the same thing, and is not the thing you are being asked to certify.
+
+## The design almost everyone ships
+
+The common pattern is a decorator, a middleware, or a callback. You wrap the function that performs the consequential action, and inside the wrapper you call the policy engine before you call the tool.
+
+```
+@gate(action="payments.refund")
+def issue_refund(order_id, amount_paise):
+    return payments.refund(order_id, amount_paise)
+```
+
+This is a good pattern. We ship it, and it is often the first integration a team does, because it takes five minutes and it works.
+
+It is also voluntary, and it is worth being precise about what that means. The check runs only on the path that goes through the decorated function. It does not run when a developer adds a second code path in a hurry. It does not run when the agent calls the payment SDK directly because the decorated helper did not expose the parameter it needed. It does not run when a new tool is registered in the agent's tool list and nobody remembers that tools need decorating. And it does not run when the model, having been told it may not issue a refund, writes and executes a small script that issues a refund.
+
+The last one gets the attention, because it sounds like the model is being devious. It usually is not. It is doing exactly what a competent engineer would do when the obvious path is blocked: finding another one. The interesting failure is not the adversarial case. It is the ordinary Tuesday where someone adds a code path and nobody notices that it left the gate behind.
+
+## What the property actually needs to be
+
+The property you want is not "the agent asks permission before acting." It is:
+
+> There is no execution path from the agent's runtime to a consequential effect that does not pass through the decision point.
+
+Stated that way, the decorator obviously does not give it to you. The decorator gives you a property about a particular function. The property you want is about the whole runtime.
+
+Once you write it down, the design follows in one step. If the agent's runtime holds the credential for the payment rail, then a path exists that does not cross the gate, no matter how many functions you decorate. The credential is the capability. Anything holding it can act.
+
+So do not let the runtime hold it.
+
+## Credential vaulting
+
+The gate holds the keys. The agent holds none.
+
+```
+agent runtime          gate                    tool
+  no credentials  ->   holds credentials  ->   payment rail
+                       evaluates policy        OMS
+                       mints short-lived       CRM
+                       scoped credential
+```
+
+The agent's environment has no key for the payment rail, no key for the order system, no key for the CRM. When it wants to act, it asks the proxy. The proxy assembles the evidence manifest, evaluates the compiled policy, and either performs the call itself or mints a credential scoped to that one action with a short expiry.
+
+Skipping the gate now means having nothing to act with. That is a different kind of claim from "the agent is instructed to use the gate." It does not depend on the agent's cooperation, on the model's instruction-following, on the completeness of your decorator coverage, or on nobody adding a code path in a hurry.
+
+It is also a claim you can test cheaply. Take the agent's environment, remove the proxy, and see what it can still do. If the answer is "nothing consequential," the property holds. If the answer is "quite a lot," you have a decorator wearing a proxy's clothes.
+
+## The three objections, in the order we get them
+
+**"This just moves the problem. Now the proxy is the target."**
+
+Correct, and that is the point. You have replaced a diffuse property, which had to hold across every code path in a codebase that changes daily, with a concentrated one that holds at a single component you can review, instrument and put behind your own key management. Concentrating a security property into one auditable place is most of what security engineering is. The proxy is a smaller thing to defend than a codebase.
+
+The important part is that the proxy's credentials are backed by your KMS and not ours. Revoking at your KMS revokes at the gate. No cooperation from us is required, which means we are not part of the trust argument.
+
+**"Latency."**
+
+Most actions an agent takes are not consequential. Reading a ticket, drafting a summary and searching a knowledge base are declared as sensitivity NONE and pass through logged and ungated, at roughly zero added cost. The full evaluation runs on the actions that can lose you money or move regulated data, which are a small fraction of the call volume, and it runs against a policy pack that was compiled offline. The runtime does no parsing and no interpretation. Single-digit milliseconds.
+
+The honest version of this answer is that latency is a real cost and we pay it exactly where it buys something.
+
+**"Our agent framework already has a permission system."**
+
+Framework permission systems are enforcement inside the framework. That is genuinely useful, and we bind to those hooks where they exist. But the boundary of a framework's enforcement is the boundary of the framework, and agent systems in production are rarely one framework. They are a framework, plus some direct SDK calls, plus a cron job somebody wrote, plus an integration that predates the framework. The credential is the thing every one of those has in common.
+
+## What this does not fix
+
+It does not stop an agent from doing something harmful with an action that policy allows. If your policy permits refunds under ten thousand rupees and the agent issues nine hundred of them, every one of those was gated, allowed and recorded, and you have a rate limit problem rather than an interception problem. The gate makes that visible in a ledger within seconds instead of at month end. It does not prevent it, and we should not claim it does.
+
+It does not fix policy that is wrong. A gate enforces the policy you compiled. If the policy says the wrong thing, you get the wrong thing enforced consistently and recorded carefully, which is better than the alternative and is not the same as safety.
+
+And it does not cover tools you have not put behind it. During scoping the first thing we do is enumerate what the agent can still reach directly, and that list is usually longer than the team expected. That conversation is uncomfortable and it is the most valuable hour of the engagement.
+
+## The one-line version
+
+If the agent can act without asking, the interceptor is documentation. Take away the keys and the question stops being about behaviour and starts being about capability, which is the only version of the question that has a checkable answer.

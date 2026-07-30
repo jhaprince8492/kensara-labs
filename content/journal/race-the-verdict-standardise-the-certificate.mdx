@@ -1,0 +1,67 @@
+We run a solver portfolio. For a given claim we start Z3 and CVC5 on the same problem, take the first answer, and cancel the other. It is an old trick and it works: the wall-clock time of a portfolio is the minimum over its members, and on our workload that is a large win, because the two solvers are fast on different shapes and neither is reliably faster than the other.
+
+Then we tried to replay a proof from three weeks earlier and got a different assurance object.
+
+The verdict was the same. `UNSAT`, both times. The certificate was not.
+
+## Why the certificate differs when the verdict does not
+
+An unsat core is a subset of the constraints that is sufficient to derive the contradiction. Nothing in the definition says it is unique, and in practice it very much is not. Two solvers reach the contradiction along different derivations and hand you different sufficient subsets. Two runs of the same solver can do it too, if anything upstream changed the order the constraints were asserted in.
+
+For our medical device example, the same proof produced these two cores on different days:
+
+```
+run 1  z3 4.13.0    UNSAT 41ms   core R-0087 R-0141 R-0302 R-0398
+run 2  cvc5 1.2.0   UNSAT 38ms   core R-0087 R-0141 R-0356 R-0398 R-0402
+```
+
+Both are correct. Both are minimal in the sense that removing any element makes the remainder satisfiable. They are different sets.
+
+This is fine if the core is a debugging aid. It is not fine if the core is the evidence. Ours is the evidence: the unsat core is what we bind to the clause, it is what the assessor reads as the derivation, and it is inside the bytes the content hash covers. A nondeterministic core means a nondeterministic assurance object, which means replay fails, which means the central claim of the product is false.
+
+The worst part is how quietly it fails. The verdict agrees, so every test that checks the answer passes. Only the digest disagrees, and only if you actually compare digests across runs, which is exactly the test nobody writes until it has bitten them.
+
+## The three fixes that do not work
+
+**Pin one solver.** This removes the nondeterminism and most of the value. Z3 and CVC5 are good at different things, and on our routing distribution, forcing everything to one of them roughly doubles p95 and turns a meaningful slice of claims into budget-exceeded refusals. Refusals are honest, but a refusal we could have avoided by using the other solver is not honest, it is just slow.
+
+**Take the first answer and re-derive the core deterministically afterwards.** Attractive, and it is half of the eventual answer, but on its own it means running a second, slower minimisation on every proof. It also does not tell you which solver's assertion order to minimise against, so you have moved the nondeterminism rather than removed it.
+
+**Sort the core.** We tried this early, embarrassingly. Sorting makes the serialization stable given a core. It does nothing about the core being a different set.
+
+## Separating the two questions
+
+The unlock was noticing that we had been treating one operation as atomic when it is two, with different requirements:
+
+- **Deciding** whether the goal is entailed. Latency-sensitive. The answer is unique, so any solver that gets there is as good as any other. Race it.
+- **Explaining** why. Not latency-sensitive in the same way, and the answer is not unique, so it must be produced by a procedure that is a function of the input alone.
+
+Once the two are separated, the portfolio is fine. It only ever settles the first question.
+
+## What we actually do
+
+1. Route by claim shape to a portfolio, deterministically. The routing is a pure function of the normalised claim, so the same claim always gets the same portfolio, and the portfolio membership is recorded.
+2. Race the portfolio. First answer wins. Record which solver answered and how long it took, as telemetry.
+3. Discard that solver's core. This is the step people find strange. We throw away a perfectly good explanation because it is not a reproducible one.
+4. Run a canonical minimisation pass: a fixed solver at a pinned version, with constraints asserted in canonical order, over a deletion-based minimisation that walks candidates in rule-id order and keeps the first minimal set it reaches. Nothing about this depends on which solver won the race.
+5. Bind that core into the assurance object.
+
+The canonical pass costs 6 to 20ms on typical claims. We are content to pay it, because it converts a property that held by luck into one that holds by construction.
+
+The invariant that falls out is worth stating precisely, because it is narrower than "everything is deterministic":
+
+> The verdict may be produced by any member of the portfolio. The certificate is produced by exactly one procedure, pinned by version, and is a function of the canonicalised input alone.
+
+## Consequences we had to accept
+
+**The recorded core is sometimes larger than the racing solver's.** Deletion-based minimisation in a fixed order does not always find the smallest minimal set. We chose reproducible over smallest. An assessor reading five rules instead of four is a smaller cost than an assessor being unable to reproduce four.
+
+**Upgrading the minimisation solver is a migration, not an install.** A new version can produce a different canonical core for the same input. So the solver version is part of the pinned toolchain recorded in every object, and when we move it we re-derive and re-issue, with both objects retained and the supersession recorded. This is the single most annoying consequence of the determinism contract and we have not found a way around it that is honest.
+
+**Telemetry and evidence are now different data.** Which solver won, and in what time, is operationally interesting and is deliberately not part of the signed payload, because it varies with load. The duration you see in an assurance object is the canonical pass, not the race. We were tempted to record the fast number. It would have been a lie in a field labelled as evidence.
+
+## The general shape
+
+We think this generalises past solvers. Any time you optimise a system by racing nondeterministic workers, ask what the consumer of the output actually needs. If they need the answer, race freely. If they need the derivation, the race can settle the answer and something reproducible has to produce the derivation.
+
+The mistake is not racing. The mistake is assuming that because two workers agreed, their work was interchangeable.

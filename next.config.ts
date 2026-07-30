@@ -1,3 +1,4 @@
+import createMDX from '@next/mdx';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
@@ -9,8 +10,11 @@ const nextConfig: NextConfig = {
   images: { unoptimized: true },
   reactStrictMode: true,
   productionBrowserSourceMaps: false,
+  pageExtensions: ['ts', 'tsx', 'mdx'],
   typescript: { ignoreBuildErrors: false },
   eslint: { ignoreDuringBuilds: false },
 };
 
-export default nextConfig;
+const withMDX = createMDX({});
+
+export default withMDX(nextConfig);

@@ -1,0 +1,73 @@
+Every formal methods company eventually ships a language. It is hard to avoid. You need a precise way to state properties, the existing notations each carry a solver's assumptions, and so you write your own, and then you are in the business of teaching it.
+
+We wrote one too. It is called KVL. The difference is that we do not expect you to write it, and that decision shaped more of the product than any other.
+
+## The thirty year problem
+
+Formal verification works. It has certified avionics and silicon since the 1990s, and in the domains where a regulator requires it, it is unremarkable engineering rather than research.
+
+It has also stayed almost exactly where the regulator put it, and the reason is not that the mathematics is slow. Solvers got dramatically faster over that period. The reason is that writing the specification costs more than writing the software.
+
+The numbers people quote in industry vary, and the shape is consistent: a codebase that took two to four person-years to build takes twenty to thirty person-years to specify formally. Most of that is not thinking about the property. It is translating a property somebody already understands into a notation a solver will accept, then discovering that the notation cannot express the third clause, then restructuring.
+
+So the bottleneck is translation. Anything that does not attack translation is not attacking the problem.
+
+## The move everyone makes
+
+The standard response is to make the specification language nicer. Better syntax, better error messages, better tooling, a type system that catches the common mistakes.
+
+This helps, and it does not change the shape of the cost, because the cost is not syntax. It is that a specification language asks a domain expert to become a second kind of expert. The person who knows that both infusion timers must never arm in the same control cycle is a device engineer. Asking them to also hold temporal logic in their head is asking for a career change, and they have a job.
+
+Every "we made formal methods accessible" product we have used still requires someone on the team to be fluent. That person becomes a bottleneck and eventually leaves, and the practice leaves with them.
+
+## The compiler analogy, used precisely
+
+Nobody writes LLVM IR. That is not an accident or a failure of documentation. LLVM IR exists so that N languages and M targets need N plus M pieces of work instead of N times M, and it is deliberately not a language humans author, which is exactly why it can be shaped for the machine rather than for reading.
+
+KVL occupies the same position. Requirements go in from one side. Solvers and certification output formats come out the other.
+
+```
+requirements  ─┐                     ┌─  z3
+clauses       ─┼─►  KVL  ─────────►  ┼─  cvc5
+rule bases    ─┘                     ├─  soufflé
+                                     ├─  lean
+                                     ├─  SVA
+                                     ├─  ACSL
+                                     └─  TLA+
+```
+
+Without an intermediate representation, supporting four solvers and three certification formats from three kinds of source means twenty-one translations to write and keep correct. With one, it is ten. That is the boring engineering reason it exists.
+
+The interesting reason is what it lets us do with the translation itself.
+
+## Where the model goes, and where it does not
+
+A language model is genuinely good at the translation step. It has read the standards, it has read a great deal of code, and turning "the pump shall not arm both timers within the same control cycle" into a candidate temporal formula is close to what it is for.
+
+It is also completely unsuitable for deciding whether a claim is true, because when it is wrong it is wrong fluently. That failure mode is fine in a draft and disqualifying in a verdict.
+
+So the model drafts KVL, and that is the whole of its involvement. The pipeline is:
+
+1. The model produces candidate KVL from the requirement text. Advisory. Not authoritative.
+2. The candidate is rendered back into plain English, in the engineer's vocabulary, not in logic notation.
+3. A named human approves or edits it. Nothing proceeds until they do.
+4. The solver runs on the confirmed specification.
+5. The assurance object records the requirement, the confirmed specification, the approver, and the verdict.
+
+The confirmation gate is the load-bearing step, and it is the one that makes the rest defensible. The engineer never reads `G !(arm(t1) & arm(t2))`. They read "the pump never arms both timers in the same cycle" and answer yes or no. That is a question they can answer in seconds using knowledge they already have, and it is the only question we ask them.
+
+If they say no, the correction is recorded as a structured record: what was intended, what we proposed, what was corrected, what resulted. Those records are how the translator improves for that vertical, and they exist because the confirmation step exists. A system that skipped confirmation would be faster and would learn nothing.
+
+## What you give up
+
+**You cannot express everything.** A specification language with human authors can be a universal one, because a human will find a way. An IR fed by translation covers what the translator covers. When you hit the edge, you get a refusal that names the gap, for example a term that is undefined in the loaded pack, rather than a proof of something adjacent to what you meant. We think a stated gap is the right failure, and it is still a gap.
+
+**You depend on us for coverage.** If your domain needs a construct KVL cannot represent, you cannot add it yourself today. That is a real limitation and the honest answer to "what happens then" is that it becomes work on our side, on a timeline we agree with you.
+
+**You have to trust the confirmation rendering.** The English we render back has to faithfully represent the KVL, or the whole argument collapses into a nicer-looking version of trusting the model. That renderer is deterministic, it is derived from the KVL rather than generated alongside it, and it is the part of the system we test hardest.
+
+## The line we keep
+
+You never write KVL. That is the point. The measure of whether we are succeeding is not how elegant the IR is. It is whether a device engineer who has never heard of temporal logic can produce a proof that a notified body accepts, using the words they already use, in an afternoon.
+
+That is also the number we would want to be held to. Not the solver's benchmark time. The time from a requirement in someone's own words to an artifact an assessor accepts.
