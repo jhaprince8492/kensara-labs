@@ -19,14 +19,18 @@ export const site = {
   nav: [
     { label: 'Formus', href: '/formus/' },
     { label: 'Sentinel', href: '/sentinel/' },
-    { label: 'Assurance object', href: '/assurance-object/' },
+    { label: 'Platform', href: '/platform/' },
+    { label: 'Industries', href: '/industries/' },
     { label: 'Company', href: '/company/' },
   ] satisfies NavItem[],
 
   cta: { label: 'Request access', href: '/demo/' },
 
   /** Utility links, top-right, small. Populated as those routes ship. */
-  utility: [] satisfies NavItem[],
+  utility: [
+    { label: 'Journal', href: '/journal/' },
+    { label: 'Security', href: '/security/' },
+  ] satisfies NavItem[],
 
   footer: {
     positioning: 'Formus proves. Sentinel permits. Both emit the Assurance Object.',
@@ -52,13 +56,17 @@ export const site = {
         links: [
           { label: 'Formus', href: '/formus/' },
           { label: 'Sentinel', href: '/sentinel/' },
+          { label: 'Platform', href: '/platform/' },
           { label: 'Assurance object', href: '/assurance-object/' },
         ] satisfies NavItem[],
       },
       {
         heading: 'COMPANY',
         links: [
+          { label: 'Industries', href: '/industries/' },
           { label: 'Company', href: '/company/' },
+          { label: 'Journal', href: '/journal/' },
+          { label: 'Security', href: '/security/' },
           { label: 'Request access', href: '/demo/' },
         ] satisfies NavItem[],
       },

@@ -7,7 +7,7 @@ import { Eyebrow } from '@/components/primitives/Eyebrow';
 import { Prose } from '@/components/primitives/Prose';
 import { Reveal } from '@/components/primitives/Reveal';
 import { Section } from '@/components/primitives/Section';
-import { GateStill } from '@/components/scenes/GateStill';
+import { Gate } from '@/components/scenes/Gate';
 import { sentinel } from '@/content/copy/sentinel';
 
 export const metadata: Metadata = {
@@ -31,9 +31,7 @@ export default function SentinelPage() {
         <p className="measure mt-7 text-17 text-ink-400 sm:text-21">{sentinel.hero.sub}</p>
         <p className="mono mt-8 text-14 text-refute">{sentinel.hero.readout}</p>
 
-        <div className="mt-14 border border-hairline bg-slate-900 p-4 sm:p-6">
-          <GateStill className="w-full" />
-        </div>
+        <Gate className="mt-14" />
       </section>
 
       {/* the bypass problem */}

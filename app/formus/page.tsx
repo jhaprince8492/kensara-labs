@@ -8,6 +8,7 @@ import { Reveal } from '@/components/primitives/Reveal';
 import { Section } from '@/components/primitives/Section';
 import { VerdictChip } from '@/components/primitives/VerdictChip';
 import { WorkedExample } from '@/components/primitives/WorkedExample';
+import { ProofGraph } from '@/components/scenes/ProofGraph';
 import { ProofGraphStill } from '@/components/scenes/ProofGraphStill';
 import { assuranceBody } from '@/content/data/assuranceObject';
 import { formus } from '@/content/copy/formus';
@@ -125,9 +126,7 @@ export default async function FormusPage() {
             <p className="mono mt-7 text-14 text-proof-ink">{formus.minimisation.readout}</p>
           </Reveal>
           <Reveal delay={60}>
-            <div className="border border-hairline bg-slate-900 p-4">
-              <ProofGraphStill className="w-full" />
-            </div>
+            <ProofGraph label="Scene C, the proof graph" />
           </Reveal>
         </div>
       </Section>

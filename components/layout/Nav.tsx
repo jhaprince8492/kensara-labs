@@ -41,12 +41,26 @@ export function Nav() {
           ))}
         </nav>
 
-        <Link
-          href={site.cta.href}
-          className="mono ml-auto hidden border border-hairline px-3 py-1.5 text-14 text-ink-100 transition-colors duration-[120ms] hover:border-proof hover:text-proof-ink md:ml-0 md:block"
-        >
-          {site.cta.label}
-        </Link>
+        <div className="ml-auto hidden items-center gap-5 md:flex">
+          {site.utility.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={isCurrent(item.href) ? 'page' : undefined}
+              className={`mono text-12 transition-colors duration-[120ms] hover:text-ink-100 ${
+                isCurrent(item.href) ? 'text-ink-100' : 'text-ink-500'
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+          <Link
+            href={site.cta.href}
+            className="mono border border-hairline px-3 py-1.5 text-14 text-ink-100 transition-colors duration-[120ms] hover:border-proof hover:text-proof-ink"
+          >
+            {site.cta.label}
+          </Link>
+        </div>
 
         <button
           type="button"
@@ -66,7 +80,7 @@ export function Nav() {
           className="border-t border-hairline bg-slate-900 md:hidden"
         >
           <ul className="mx-auto max-w-[88rem] px-5 py-2 sm:px-8">
-            {[...site.nav, site.cta].map((item) => (
+            {[...site.nav, ...site.utility, site.cta].map((item) => (
               <li key={item.href} className="border-b border-hairline last:border-b-0">
                 <Link
                   href={item.href}

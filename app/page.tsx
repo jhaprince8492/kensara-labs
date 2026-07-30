@@ -210,14 +210,29 @@ export default async function HomePage() {
         </Reveal>
 
         <ul className="mt-12 grid gap-px border border-hairline bg-hairline sm:grid-cols-2 lg:grid-cols-3">
-          {home.industries.tiles.map((tile, index) => (
-            <Reveal as="li" key={tile.name} delay={index * 30} className="bg-slate-900">
+          {home.industries.tiles.map((tile, index) => {
+            const inner = (
               <div className="h-full p-6">
                 <Eyebrow>{tile.standards}</Eyebrow>
                 <p className="mt-3 text-21 text-ink-100">{tile.name}</p>
               </div>
-            </Reveal>
-          ))}
+            );
+
+            return (
+              <Reveal as="li" key={tile.name} delay={index * 30} className="bg-slate-900">
+                {tile.href ? (
+                  <Link
+                    href={tile.href}
+                    className="block h-full transition-colors duration-[120ms] hover:bg-slate-800"
+                  >
+                    {inner}
+                  </Link>
+                ) : (
+                  inner
+                )}
+              </Reveal>
+            );
+          })}
         </ul>
       </Section>
 

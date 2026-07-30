@@ -137,11 +137,23 @@ export const home = {
     h2: 'Where it runs.',
     tiles: [
       { name: 'Aerospace & defence', standards: 'DO-178C / DO-333', href: null },
-      { name: 'Healthcare', standards: 'IEC 62304 / ISO 13485', href: null },
-      { name: 'Financial services', standards: 'RBI / SEBI / DPDP', href: null },
+      {
+        name: 'Healthcare',
+        standards: 'IEC 62304 / ISO 13485',
+        href: '/industries/healthcare-lifesciences/',
+      },
+      {
+        name: 'Financial services',
+        standards: 'RBI / SEBI / DPDP',
+        href: '/industries/financial-services/',
+      },
       { name: 'Automotive', standards: 'ISO 26262', href: null },
       { name: 'Semiconductors', standards: 'firmware root-of-trust', href: null },
-      { name: 'Regulated SaaS', standards: 'GDPR / DPDP / SOC 2', href: null },
+      {
+        name: 'Regulated SaaS',
+        standards: 'GDPR / DPDP / SOC 2',
+        href: '/industries/regulated-saas/',
+      },
     ] satisfies IndustryTile[],
   },
 
@@ -151,7 +163,7 @@ export const home = {
     body: "A scoping call is 45 minutes. Bring one real workflow: an agent action you've stopped short of automating, or a requirement your certification body keeps sending back. We'll tell you honestly whether this is the right instrument for it.",
     ctas: [
       { label: 'Request access', href: '/demo/', kind: 'primary' as const },
-      { label: 'Read the engineering journal', href: null, kind: 'secondary' as const },
+      { label: 'Read the engineering journal', href: '/journal/', kind: 'secondary' as const },
     ],
   },
 } as const;
