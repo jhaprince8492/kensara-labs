@@ -10,14 +10,19 @@ pnpm check          # typecheck, lint, build, bundle assertions
 ```
 
 `pnpm check` is the gate. It fails if `three` reaches any route's initial
-chunks, if initial JS passes 180KB gzipped, or if the home page passes 1.4MB.
+chunks, if initial JS passes 180KB gzipped, if the home page passes 1.4MB, or if
+a seeded scene generator drifts.
+
+Do not run `pnpm build` while `pnpm dev` is running: they share `.next`, and the
+build will fail or emit a half-written manifest.
 
 ## Where things live
 
 | Path | What |
 |---|---|
 | `content/copy/` | Every page's text, as typed objects. Edit here, not in JSX. |
-| `content/data/` | The assurance object, the team. |
+| `content/data/` | The assurance object, the team, the sectors, security attestations. |
+| `content/journal/` | MDX posts and the typed post registry. |
 | `lib/policy/` | The deterministic evaluator behind `SentinelGate`. |
 | `lib/hash.ts` | Canonical serialization and SHA-256. |
 | `lib/scenes/` | Seeded generators shared by each live scene and its still. |
@@ -47,9 +52,14 @@ composed still and a text equivalent; every reveal becomes instant.
 | `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Enables the Plausible stub. Unset means no analytics at all. |
 | `NEXT_PUBLIC_FORM_ENDPOINT` | POST target for the access request form. |
 | `NEXT_PUBLIC_CONTACT_EMAIL` | `mailto:` fallback for the form. |
+| `NEXT_PUBLIC_SECURITY_EMAIL` | Published disclosure address on `/security`. |
 
 ## Status
 
-Phase 1 complete: home (8 sections, Scene A live), `/formus`, `/sentinel`,
-`/assurance-object`, `/company`, `/demo`. Scenes B and C ship as composed
-stills. Phases 2 and 3 are listed in the build brief.
+Phases 1 and 2 complete. All three scenes are live behind the tier check, with
+composed stills on tier 3. Sixteen routes: home, `/formus`, `/sentinel`,
+`/platform`, `/security`, `/assurance-object`, `/industries` and three sector
+pages, `/journal` and three posts, `/company`, `/demo`.
+
+Phase 3 is the remaining three sector pages, `/governance`, `/formus/kvl`,
+`/sentinel/policy-packs`, and a `/docs` shell.

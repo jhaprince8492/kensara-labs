@@ -65,3 +65,37 @@ tension with itself. One line each, newest phase last.
 
 - `check-bundle.mjs` fails the build if any route's initial chunks contain a three.js fingerprint, if any route's initial JS exceeds 180KB gzipped, or if the home page's total gzipped weight exceeds 1.4MB.
 - Measured: home initial JS 112.8KB gzip, home total 142.0KB gzip, `three` absent from every initial chunk.
+
+## Phase 2
+
+### Scenes
+
+- `useSceneArmed` replaces the per-scene gate: a live scene mounts only on a capable tier, only once its container is within 200px of the viewport, and only once the browser is idle. All three scenes share it.
+- Scene C's sequence fires once on arrival and then only on request. A three-second reveal that replays on every scroll-past stops being persuasive by the third viewing, so it gets a visible re-run control instead.
+- Scene C's choreography is one progress value driving three overlapping windows: dim 0 to 0.30 on ease-out-quart, ignite 0.15 to 0.55, collapse 0.35 to 1.0 on ease-in-out-quint, staggered by each node's radius so the collapse reads as a wave inward rather than a fade.
+- The canonical minimisation is deliberately slower to leave and faster through the middle. A linear collapse read as a transition; this reads as a reduction, which is the actual claim.
+- Scene C's core matches the assurance object's recorded `unsat_core` exactly, and `check-scenes` asserts it. The graph on screen and the hash in the object describe the same proof.
+- `/formus` keeps the composed still in the hero and puts the live scene in the minimisation section, rather than mounting Scene C twice on one page. The hero still shows the resolved state, which is the right hero image; the section shows it resolving.
+- Scene B's three scenarios are fixed rather than sampled. A gate that demonstrates itself differently on every visit is demonstrating the wrong property. The readout under the corridor names the action, pack and deciding rule for whichever scenario is on screen, so the motion is never decorative.
+- Scene B's corridor is drawn as four rails plus ribs so depth reads without lights, and every material is `MeshBasicMaterial`. No lighting pass, and the flat instrument look is the intent rather than a compromise.
+- Source geometries in Scene B are hoisted to module constants; creating them inline in JSX leaked a geometry per render.
+- `check-scenes` is a new build gate. The scenes are seeded, so their output is checkable without a GPU: it asserts finite coordinates, the exact core ids, a sampled share that does not overstate the true 128/14,412, full core connectivity, and that two builds of the same seeded graph are byte-identical.
+
+### Pages
+
+- `/industries` (the hub) ships in Phase 2 rather than Phase 3. It is in the blueprint sitemap, and the three sector pages need a parent for the nav item to point at. The three unpublished sectors appear on the hub with their standards and are not links.
+- The six sector pages share one rigid template driven by `content/data/industries.ts`. Consistency is worth more than creativity here: a buyer comparing two pages should find the same thing in the same place.
+- Every sector page carries the "what we do not do here" section as its own numbered step in the template rather than as a footnote, because naming the boundary is the most credible thing on the page.
+- `/security` keeps its factual attestations in `content/data/security.ts`, shipped empty. Certification status and sub-processors are claims about the world; the page states an honest fallback rather than a placeholder, and the architecture claims (which follow from the design) are stated in full.
+- Nav settles at five primary items plus two utility links plus the CTA. `Assurance object` moved out of the primary nav to the footer and inline links when `Platform` and `Industries` arrived, keeping the blueprint's seven-item ceiling.
+
+### Journal
+
+- MDX bodies live in `content/journal/` with a typed registry in `posts.ts` holding metadata and a static import map, rather than as route-level `page.mdx` files. Keeps content out of `app/` as the layout specifies, and `generateStaticParams` reads the registry.
+- `mdx-components.tsx` applies the same measure and the same mono rule as the rest of the site: prose proportional and capped, code and identifiers monospaced.
+- Post dates are set before today so the cadence claim on the index page is not contradicted by the archive.
+
+### Verification
+
+- The Browser pane was not compositing frames during this phase, so the three live scenes were verified structurally (typecheck, clean production build, seeded-generator assertions, zero console errors, correct still fallbacks and text equivalents) and **not visually**. A human pass on the animation itself is outstanding.
+- Running `next build` while `next dev` shares `.next` produces a half-written manifest that passed every budget. `check-bundle` now rejects a manifest with fewer than ten routes or an implausibly small initial bundle.

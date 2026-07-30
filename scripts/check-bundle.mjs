@@ -45,6 +45,15 @@ try {
   process.exit(1);
 }
 
+// A dev server sharing .next can leave a manifest that parses but points at a
+// half-written build. That state would sail under every budget, so reject it
+// rather than report a pass nobody can trust.
+const routeCount = Object.keys(manifest.pages).length;
+if (routeCount < 10) {
+  console.error(`check-bundle: the manifest lists only ${routeCount} routes. Rebuild from a clean .next.`);
+  process.exit(1);
+}
+
 for (const [route, files] of Object.entries(manifest.pages)) {
   const scripts = files.filter((file) => file.endsWith('.js'));
   let total = 0;
@@ -70,6 +79,11 @@ for (const [route, files] of Object.entries(manifest.pages)) {
   }
 
   notes.push(`${route.padEnd(24)} initial js ${kb(total).padStart(9)}`);
+  if (total < 40 * 1024) {
+    failures.push(
+      `${route}: initial JS is only ${kb(total)}, which means the build is incomplete rather than small.`,
+    );
+  }
   if (total > JS_BUDGET) {
     failures.push(`${route}: initial JS ${kb(total)} exceeds the ${kb(JS_BUDGET)} budget.`);
   }
