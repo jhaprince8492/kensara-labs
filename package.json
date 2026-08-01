@@ -16,12 +16,12 @@
   "dependencies": {
     "@mdx-js/loader": "^3.1.0",
     "@mdx-js/react": "^3.1.0",
-    "@next/mdx": "^15.5.4",
+    "@next/mdx": "^15.5.22",
     "@react-three/drei": "^10.7.0",
     "@react-three/fiber": "^9.3.0",
     "gsap": "^3.13.0",
     "motion": "^12.23.0",
-    "next": "15.5.4",
+    "next": "15.5.22",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "three": "^0.185.1"
@@ -35,7 +35,7 @@
     "@types/react-dom": "^19.1.0",
     "@types/three": "^0.185.1",
     "eslint": "^9.18.0",
-    "eslint-config-next": "15.5.4",
+    "eslint-config-next": "15.5.22",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.7.3"
   }
