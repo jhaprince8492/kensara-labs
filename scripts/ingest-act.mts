@@ -83,6 +83,11 @@ async function main() {
   if (!src || !existsSync(src)) throw new Error(`--src not found: ${src ?? '(missing)'}`);
 
   const frames = Number(arg('frames') ?? config.frames);
+  // Quality is tunable per act because the grain that keeps near-black
+  // gradients from posterising is expensive, and each act carries a different
+  // amount of moving detail.
+  const desktopQuality = Number(arg('quality') ?? 42);
+  const mobileQuality = Number(arg('mobile-quality') ?? desktopQuality - 6);
   const ffmpeg = await resolveFfmpeg();
   const slug = actSlug(id);
   const base = join(CINEMA_DIR, slug);
@@ -151,13 +156,13 @@ async function main() {
       const source = join(pngDir, item.file);
 
       const desktopOut = join(base, 'desktop', frameName(item.index));
-      await sharp(source).avif({ quality: 42, effort: 6 }).toFile(desktopOut);
+      await sharp(source).avif({ quality: desktopQuality, effort: 6 }).toFile(desktopOut);
       desktopBytes += (await stat(desktopOut)).size;
 
       const mobileOut = join(base, 'mobile', frameName(item.index));
       await sharp(source)
         .resize({ width: BUDGET.mobileWidth })
-        .avif({ quality: 36, effort: 6 })
+        .avif({ quality: mobileQuality, effort: 6 })
         .toFile(mobileOut);
       mobileBytes += (await stat(mobileOut)).size;
 
