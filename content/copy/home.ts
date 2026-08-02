@@ -29,9 +29,9 @@ export const home = {
   },
 
   hero: {
-    eyebrow: 'KENSARA LABS · PROVABLE AI GOVERNANCE',
-    h1: ['Software that decides', 'needs more than software that was tested.'],
-    sub: 'Kensara proves what your systems claim and gates what your agents do, and emits a signed artifact your auditor can verify without trusting us.',
+    eyebrow: 'KENSARA LABS',
+    h1: ['Agent that decides, intends any authorative action', 'needs to be Provably 100% correct.'],
+    sub: 'Kensara builds the trust infrastructure for enterprise AI: engineering requirements, regulations, and safety rules turned into mathematics an AI cannot violate -so every system is proven correct, and every action it takes can be traced, challenged, and blocked..',
     primaryCta: { label: 'See a decision get gated', href: '#gate' },
     secondaryCta: { label: 'Request access', href: '/demo/' },
     sceneAlt:

@@ -28,7 +28,7 @@ export default async function HomePage() {
         <div className="relative mx-auto w-full max-w-[88rem] px-5 py-24 sm:px-8">
           <Eyebrow>{home.hero.eyebrow}</Eyebrow>
 
-          <h1 className="mt-6 max-w-[18ch] text-40 sm:text-60 lg:text-88">
+          <h1 className="mt-6 max-w-[26ch] text-40 sm:text-60 lg:text-88">
             {home.hero.h1.map((line) => (
               <span key={line} className="block">
                 {line}
