@@ -39,7 +39,10 @@ const MARK_TONE: Record<PredicateStatus, string> = {
 export function SentinelGate({ headingId }: { headingId?: string }) {
   const [input, setInput] = useState<GateInput>(DEFAULT_INPUT);
   const [decision, setDecision] = useState<Decision | null>(null);
-  const [phase, setPhase] = useState<'idle' | 'running' | 'settled'>('idle');
+  // `stale` keeps the last decision on screen after an input changes, clearly
+  // marked as no longer matching the form. Blanking the panel would put the
+  // component back in the empty state it is not allowed to sit in.
+  const [phase, setPhase] = useState<'idle' | 'running' | 'settled' | 'stale'>('idle');
   const [revealed, setRevealed] = useState(0);
   const [announcement, setAnnouncement] = useState('');
 
@@ -63,12 +66,32 @@ export function SentinelGate({ headingId }: { headingId?: string }) {
     });
   }, []);
 
+  // Land on a decision rather than on an empty panel.
+  //
+  // The default scenario is evaluated once on mount and shown already settled,
+  // with no animation and no announcement: a screen reader should not be told a
+  // verdict nobody asked for. This is the state a screenshot, a PDF export or a
+  // visitor who never clicks will see, so it has to be the decision and not
+  // "no decision yet".
+  useEffect(() => {
+    let cancelled = false;
+
+    void evaluate(DEFAULT_INPUT, new Date()).then((result) => {
+      if (cancelled) return;
+      setDecision(result);
+      setRevealed(result.rules.length);
+      setPhase('settled');
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const patch = useCallback(
     (next: Partial<GateInput>) => {
       clearTimers();
-      setPhase('idle');
-      setDecision(null);
-      setRevealed(0);
+      setPhase((current) => (current === 'idle' ? 'idle' : 'stale'));
       setAnnouncement('');
       setInput((current) => ({ ...current, ...next }));
     },
@@ -108,7 +131,8 @@ export function SentinelGate({ headingId }: { headingId?: string }) {
     );
   }, [clearTimers, input]);
 
-  const settled = phase === 'settled' && decision !== null;
+  const stale = phase === 'stale';
+  const settled = (phase === 'settled' || stale) && decision !== null;
   const rupees = Math.trunc(input.amount_inr / 100);
 
   return (
@@ -231,15 +255,22 @@ export function SentinelGate({ headingId }: { headingId?: string }) {
             ) : null}
           </div>
 
-          {phase === 'idle' && !decision ? (
+          {!decision ? (
             <p className="mono max-w-[46ch] text-14 text-ink-400">
-              No decision yet. Set the conditions on the left, then submit the action.
-              Nothing is sent anywhere: the pack is evaluated in this browser.
+              Evaluating the default scenario. Nothing is sent anywhere: the pack runs in
+              this browser.
+            </p>
+          ) : null}
+
+          {stale ? (
+            <p className="mono mb-4 border border-hold/40 bg-hold/8 px-3 py-2 text-12 text-hold">
+              conditions changed · this decision was made on the previous inputs · submit to
+              re-evaluate
             </p>
           ) : null}
 
           {decision ? (
-            <div className="space-y-4">
+            <div className={`space-y-4 ${stale ? 'opacity-55' : ''}`}>
               <ol className="space-y-3">
                 {decision.rules.map((rule, index) => (
                   <RuleRow key={rule.id} rule={rule} shown={index < revealed} />
