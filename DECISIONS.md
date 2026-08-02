@@ -131,3 +131,39 @@ tension with itself. One line each, newest phase last.
 
 - Home initial JS 113.5KB gzip (was 112.9), home total 151.4KB gzip (was 142.7). Both well inside budget.
 - The page is longer: roughly nine screens at a 1440x900 desktop against six before. The matrix is about 1,900px of that. If it needs to come down, the cheapest cut is H2, whose argument is now carried by the matrix's `REAL COST` lines.
+
+## Formus rebuild
+
+The page was built on the blueprint's P2 framing, which is a different product: it answered regulated questions over a rule base, with a GST input-tax-credit worked example. Formus actually automates requirement-to-property authoring and feeds existing verification flows. That is a rebuild, not an edit.
+
+### Positioning
+
+- **Formus sits above the solvers and feeds them.** The old solver section read as "we pick your solver for you", which puts us in the solver business. It now reads as "we emit into the flow you already run". Feeding an incumbent environment is a stronger commercial position than appearing to replace it.
+- **No competitor is named.** Checking engines are named (z3, cvc5, lean, nuXmv, SPIN, soufflé) and emitted formats are named (SVA, ACSL, TLA+, C assertions). Commercial verification environments are referred to as "the formal environment you already own".
+- The hero leads with the conformance gap, not with a capability: "Your tools prove the code does not crash. Formus proves it does what the requirement said." It states the gap and what we do in one breath.
+- The GST worked example is gone. One Class C infusion pump requirement now runs end to end through all eight stages, with a VIOLATED and an UNPROVEN variant beside it.
+
+### The fidelity report
+
+- New section, and the most differentiated object on the site. Reports per requirement: IMPLEMENTED, VIOLATED with the file, line, cycle and cause, VACUOUS, or UNPROVEN with a stated reason. Summary counts plus a mutation-kill and vacuity line.
+- `VerdictChip` gained those four statuses rather than getting a parallel component, so a verdict looks the same everywhere on the site. Colour semantics are unchanged: implemented is proof blue, violated is refute red, vacuous is hold amber, unproven is neutral like REFUSE.
+- The "where it breaks" line is never truncated and never behind an interaction. It is the reason the section exists.
+
+### Authority
+
+- A three-actor section replaces the single confirmation-gate section: the advisory model has no authority and proposes, the named engineer decides what the requirement meant, the deterministic checker decides whether the system satisfies it. That division is the certifiability argument, so it is stated as a structure rather than as a sentence.
+- The banned-claim phrasing is used: "the authoritative path contains no language model, verdicts come from a checker, not from a generation".
+
+### Domains
+
+- Three sections, each named: safety-critical software (medical, avionics, automotive, rail), sovereign defence and space (CEMILAC, DRDO, DDPMAS-2002), semiconductor and hardware. Continuous proof is its own section rather than a domain, because it is an expansion and not a market.
+- The AI trust layer is deliberately absent from this page.
+
+### Numbers that need sourcing before launch
+
+- "nine-month" evidence assembly and "around month six" abandonment were supplied by the company and are stated plainly. Neither is attributed on the page. **Both should be sourced or softened before launch.**
+- `mutation kill 47 of 52`, `38 requirements`, and the per-requirement rows are an illustrative worked example, consistent with the pump requirement used in the assurance object. They are not measured product output.
+
+### Cross-page consequence
+
+- The homepage Formus panel described the old product. Its eyebrow, body, hook, readout and gloss were updated to the requirement-to-proof framing, and the matrix row now names the deterministic checker rather than "the solver". No other homepage content was touched.
