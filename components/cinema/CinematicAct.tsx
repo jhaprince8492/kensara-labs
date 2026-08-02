@@ -97,6 +97,17 @@ export function CinematicAct({
       if (buffered >= REVEAL_AT) setRevealed(true);
     });
 
+    // --- scrub state --------------------------------------------------------
+    // Declared before `size()` is defined, because `size()` resets `lastIndex`
+    // and is called during setup. Declaring it lower down puts it in the
+    // temporal dead zone at that call and throws.
+    let target = 0;
+    let smooth = 0;
+    let lastIndex = -1;
+    let frame = 0;
+    let lastTime = performance.now();
+    let running = true;
+
     // --- sizing -------------------------------------------------------------
     let width = 0;
     let height = 0;
@@ -122,13 +133,6 @@ export function CinematicAct({
     size();
 
     // --- scrub --------------------------------------------------------------
-    let target = 0;
-    let smooth = 0;
-    let lastIndex = -1;
-    let frame = 0;
-    let lastTime = performance.now();
-    let running = true;
-
     const measure = () => {
       const rect = root.getBoundingClientRect();
       const vh = window.innerHeight || 1;
@@ -176,8 +180,14 @@ export function CinematicAct({
       if (index !== lastIndex) {
         const bitmap = loader.frameAt(index);
         if (bitmap) {
-          drawCover(bitmap);
-          lastIndex = index;
+          try {
+            drawCover(bitmap);
+            lastIndex = index;
+          } catch {
+            // A bitmap closed by eviction between lookup and draw throws
+            // InvalidStateError. The poster is still underneath, so the right
+            // response is to skip this frame, not to take the page down.
+          }
         }
       }
 
