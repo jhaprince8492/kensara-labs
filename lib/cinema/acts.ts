@@ -19,7 +19,15 @@ export interface ActConfig {
   /** One sentence describing the shot, for screen readers. The film carries
    *  meaning, so it is described rather than hidden. */
   label: string;
-  /** Frames at full tier. Acts I, IV and VI carry the heaviest motion. */
+  /**
+   * Frames at full tier.
+   *
+   * The blueprint asked for 72 on Acts I, IV and VI. Real graded footage lands
+   * at roughly 29KB a frame once the anti-banding grain is in, which puts 72
+   * frames over both the per-act cap and the 24KB average. The blueprint's own
+   * rule applies: reduce frame count before quality, because 48 clean frames
+   * scrub better than 72 blocky ones.
+   */
   frames: 48 | 72;
   /**
    * Four scrim stops at 0%, 38%, 72% and 100%. Tuned per act: the darkest part
@@ -39,9 +47,12 @@ export const ACTS: readonly ActConfig[] = [
     section: 'hero',
     label:
       'An immense field of faint blue points extending beyond the frame. A thin plane of light sweeps through it and touches almost none of them. Deep inside, a few points hold red.',
-    frames: 72,
-    scrim: [0.42, 0.7, 0.7, 0.52],
-    intensity: 1,
+    frames: 48,
+    // Tuned against real frames. The lighter scrim this act carried through
+    // Phase 1 was set against placeholder art and dropped body copy to 2.81:1
+    // once the footage landed. Back to the specified baseline.
+    scrim: [0.55, 0.88, 0.88, 0.6],
+    intensity: 0.85,
     light: true,
   },
   {
@@ -70,9 +81,12 @@ export const ACTS: readonly ActConfig[] = [
     section: 'turn',
     label:
       'Soft diffuse light on the left condenses as it crosses a faintly visible boundary plane and crystallises into hard geometric lattice on the right.',
-    frames: 72,
-    scrim: [0.45, 0.78, 0.78, 0.55],
-    intensity: 1,
+    frames: 48,
+    // The crystallisation is the brightest act in the film by mean luminance
+    // (0.123 against 0.042 for Act I), so it carries a heavier scrim than its
+    // placeholder needed.
+    scrim: [0.52, 0.87, 0.87, 0.62],
+    intensity: 0.9,
     light: true,
   },
   {
