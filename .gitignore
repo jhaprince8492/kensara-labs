@@ -4,4 +4,10 @@ out/
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store
-.env*.local
+
+# Secrets. `.env*.local` alone does not match a bare `.env`, and the
+# scroll-site skill keeps a live Higgsfield key in one beside its SKILL.md.
+.env
+.env.*
+!.env.example
+.claude/commands/**/.env
