@@ -167,3 +167,39 @@ The page was built on the blueprint's P2 framing, which is a different product: 
 ### Cross-page consequence
 
 - The homepage Formus panel described the old product. Its eyebrow, body, hook, readout and gloss were updated to the requirement-to-proof framing, and the matrix row now names the deterministic checker rather than "the solver". No other homepage content was touched.
+
+## Industries, all six sectors
+
+### Template
+
+Three sections were added to the rigid template, and every sector carries all of them:
+
+- **In their words.** The pain as buyers state it, set at display size in a blockquote. Attributed to a role and a context ("what we hear in scoping calls with Class C device teams") rather than to an invented person, because a fabricated customer quote on a page selling to regulated industries is the wrong first impression.
+- **The blind spot.** A three-column table: approach, what it proves, what it misses. This is the section that earns the sale, because it concedes that the tools on the bench are good at what they do before naming the question they do not ask.
+- **The walk-away object.** What you leave the engagement holding, in a `--proof` bordered panel beside the worked example.
+
+An optional `position` block renders where market position is itself the argument. Three sectors use it: sovereign access on aerospace, "we feed your flow" on semiconductors, and "this is one artifact, not a compliance platform" on regulated SaaS.
+
+### Naming
+
+- **No competitor is named anywhere.** Static analysis vendors become "static analysers", policy engines become "policy engines", compliance automation vendors become "compliance automation platforms", and hardware formal environments become "the formal environment you already own". "We are better than X" is an argument you can lose. "X starts after the assertion exists" is not.
+- The blind spot rows concede competence explicitly. The semiconductor row for an existing formal environment reads "misses: nothing at all, and it starts after the assertion already exists".
+
+### Positioning calls taken from the brief
+
+- **Aerospace** keeps the failure line verbatim, and the sovereign access block states the CEMILAC, DRDO and DDPMAS-2002 position plainly, closing on "that is not a claim about capability, it is a claim about access" rather than on a claim about competitors.
+- **Automotive** puts the incumbent concession in the boundary section: "We do not replace your runtime error analysis. It is entrenched for good reason and you should keep it. We sit above it." The wedge is requirement-to-property and combinatorial arbitration.
+- **Semiconductors** is reframed entirely. The hero is now "assertion authoring is still manual, even inside the formal environment you already own", which makes the incumbents a backend rather than a fight.
+- **Regulated SaaS** is narrowed to one claim and the scope block says so: not compliance evidence broadly, but a signed record of what autonomous agents were permitted to do.
+- **Financial services** leads the differentiation rather than burying it: policies proven internally consistent, plus credential vaulting, so the claim is that no path skips the gate.
+
+### Language corrections
+
+- "Guarantees no unauthorized PII movement" was rewritten to "no action can move regulated data outside its declared scope without an explicit, recorded override". The original is on the banned-claims list.
+- "Tamper-proof" became "tamper-evident". Hash chaining makes alteration visible; it does not prevent it, and the stronger word is the one an assessor will challenge.
+- **The healthcare quote was shipped without its opening statistic.** "A third of software-enabled medical devices get recalled for software faults" is unsourced, and it sits on the page most likely to be read by someone who will check. The rest of the quote is verbatim. **Reinstate with a citation.**
+
+### Consequences
+
+- All six sectors now have pages, so the hub no longer renders "sector page in preparation" and the three home page tiles that anchored to the hub now link to real pages.
+- Phase 3's remaining sector pages are therefore complete ahead of schedule.
