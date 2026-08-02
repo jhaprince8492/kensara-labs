@@ -98,11 +98,11 @@ function Machine({
     <div className="bg-slate-900 p-5">
       <Eyebrow>{label}</Eyebrow>
       <dl className="mt-4 space-y-3">
-        <Row term="bytes" value={result ? String(result.bytes) : running ? '…' : '—'} />
-        <Row term="key order" value={result ? result.ordering : running ? '…' : '—'} />
+        <Row term="bytes" value={result ? String(result.bytes) : running ? '…' : 'not run'} />
+        <Row term="key order" value={result ? result.ordering : running ? '…' : 'not run'} />
         <Row
           term="sha-256"
-          value={result ? result.digest : running ? '…' : '—'}
+          value={result ? result.digest : running ? '…' : 'not run'}
           wrap
           tone={result ? 'proof' : 'muted'}
         />

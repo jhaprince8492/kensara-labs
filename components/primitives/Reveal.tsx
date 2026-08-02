@@ -13,12 +13,14 @@ export function Reveal({
   children,
   delay = 0,
   className = '',
+  id,
   as: Tag = 'div',
 }: {
   children: ReactNode;
   /** Stagger in ms. Keep sequences short; scattered delays read as jitter. */
   delay?: number;
   className?: string;
+  id?: string;
   as?: 'div' | 'section' | 'li' | 'article';
 }) {
   const ref = useRef<HTMLElement>(null);
@@ -53,6 +55,7 @@ export function Reveal({
     <Tag
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ref={ref as any}
+      id={id}
       className={`reveal ${className}`}
       data-revealed={revealed ? 'true' : 'false'}
       style={delay ? ({ '--reveal-delay': `${delay}ms` } as React.CSSProperties) : undefined}

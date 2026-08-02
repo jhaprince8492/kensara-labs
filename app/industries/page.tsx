@@ -41,7 +41,15 @@ export default function IndustriesPage() {
             );
 
             return (
-              <Reveal as="li" key={sector.slug} delay={index * 30} className="bg-slate-900">
+              // The id gives the home page tiles for unpublished sectors
+              // somewhere real to land, rather than a dead link.
+              <Reveal
+                as="li"
+                key={sector.slug}
+                id={sector.slug}
+                delay={index * 30}
+                className="scroll-mt-24 bg-slate-900"
+              >
                 {sector.page ? (
                   <Link
                     href={`/industries/${sector.slug}/`}
