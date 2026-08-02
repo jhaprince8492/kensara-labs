@@ -59,9 +59,15 @@ export function ShiftDiagram() {
         />
       </svg>
 
-      <figcaption className="mt-4 flex flex-wrap justify-between gap-3">
-        <span className="eyebrow">{diagram.leftLabel}</span>
-        <span className="eyebrow">{diagram.rightLabel}</span>
+      <figcaption className="mt-4">
+        <div className="flex flex-wrap justify-between gap-3">
+          <span className="eyebrow">{diagram.leftLabel}</span>
+          <span className="eyebrow">{diagram.rightLabel}</span>
+        </div>
+        {/* The clearest sentence in the section, so it is not set at 12px. */}
+        <p className="mt-4 border-t border-hairline pt-4 text-17 text-ink-100">
+          {diagram.caption}
+        </p>
       </figcaption>
     </figure>
   );

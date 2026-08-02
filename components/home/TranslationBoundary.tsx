@@ -100,8 +100,10 @@ export function TranslationBoundary() {
         </text>
       </svg>
 
-      <figcaption className="mono mt-4 text-12 text-ink-500">
-        the model drafts the specification · a human confirms it · only then does the solver run
+      {/* The sentence that separates this from every other AI verification
+          product, so it is set at reading size rather than as a caption. */}
+      <figcaption className="mt-5 border-t border-hairline pt-5 text-17 text-ink-100">
+        {diagram.caption}
       </figcaption>
     </figure>
   );
