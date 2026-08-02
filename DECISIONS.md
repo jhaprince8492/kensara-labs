@@ -214,6 +214,38 @@ scroll behaviour and the budget reporting could be tuned before footage landed.
 - The pane resolved to `CINEMA_LIGHT` on its own, because it reports a 3g connection, and mounted canvases for exactly Acts I, IV and VI. That is the specified behaviour confirming itself by accident.
 - The Next dev server intermittently streams an empty shell on this machine. The static export renders correctly, so verification now runs against `out/` through the `kensara-static` launch config rather than against `next dev`.
 
+## Cinematic layer · Phase 2
+
+Act I and Act IV ingested from real footage, scrim and intensity retuned
+against actual frames.
+
+### The check that was missing
+
+- **`scripts/check-runtime.mts` drives a real browser** and asserts that every route hydrates, keeps its `h1`, has no uncaught error and survives a full scroll. It is in `pnpm check`.
+- It exists because a temporal dead zone error inside the act's effect took the whole home page down, and **every check in the repo passed while it was broken**. The server-rendered HTML was perfect, so the copy check was satisfied; React threw during hydration and unmounted everything. Nothing verified that the page ran.
+- It deliberately uses a real browser rather than jsdom: the bug only fired on tiers that mount a canvas, so anything without a canvas implementation would have missed it.
+- Uses the system Chrome through `playwright-core`, so no browser download. `CHROME_PATH` overrides the lookup.
+- It found a `/favicon.ico` 404 on its first run. Reported as a warning rather than a failure, because a brand mark is a decision, not a bug. **The site still has no favicon.**
+
+### Frame counts came down
+
+- **Acts I and IV are 48 frames, not 72.** Graded footage with the anti-banding grain lands at roughly 29KB a frame, which put 72 frames at 2089KB against a 1331KB per-act cap and a 24KB average. The blueprint's own rule decided it: reduce frame count before quality, because 48 clean frames scrub better than 72 blocky ones.
+- Encoder quality was then tuned per act through new `--quality` and `--mobile-quality` flags. Act I sits at 34/24, which lands it at 1113.7KB desktop and 584.3KB mobile, inside both caps.
+- Act VI is still configured for 72 and still a placeholder. It will almost certainly have to drop to 48 when its footage is ingested.
+
+### The scrim tuning in Phase 1 was wrong
+
+- Act I and Act IV both **failed the contrast audit on first contact with real footage**: 2.81:1 and 3.78:1 against a 4.5 floor. Predicted at the Phase 1 checkpoint, and the reason the audit samples the brightest pixel in the text region rather than its mean.
+- Mean luminance was never the problem: 0.042 and 0.123 against a 0.34 ceiling. The failure was bright filaments crossing the text column, which a mean hides completely.
+- The fix was to undo my own Phase 1 tuning rather than to pile on scrim. I had loosened Act I to `[0.42, 0.70, 0.70, 0.52]` to let it breathe, judged against placeholder art. It is back to the specified `[0.55, 0.88, 0.88, 0.60]` with intensity at 0.85. Act IV went to `[0.52, 0.87, 0.87, 0.62]` at 0.9, since it is the brightest act in the film.
+- Result: Act I 5.60:1, Act IV 5.36:1. Real headroom rather than a pass by a hair.
+
+### Measured
+
+- Above the fold, Act I poster plus its first eight frames: 223.3KB against a 420KB budget.
+- Totals so far: 1.82MB desktop, 1.01MB mobile, against 7MB and 3.2MB. Six acts are still placeholders and will add roughly 0.6 to 1.1MB each, so the desktop total will land near 5MB when all eight are real. Inside budget, without much slack.
+- Home initial JS 113KB, home total 141.4KB gzip.
+
 ## Industries, all six sectors
 
 ### Template
