@@ -168,6 +168,52 @@ The page was built on the blueprint's P2 framing, which is a different product: 
 
 - The homepage Formus panel described the old product. Its eyebrow, body, hook, readout and gloss were updated to the requirement-to-proof framing, and the matrix row now names the deterministic checker rather than "the solver". No other homepage content was touched.
 
+## Cinematic layer · Phase 1
+
+The machinery, wired to all eight sections with procedural placeholders so the
+scroll behaviour and the budget reporting could be tuned before footage landed.
+
+### Copy immutability
+
+- `content/` was not touched. Verified: identical set of `home.*` references in `app/page.tsx` before and after, identical literal strings, `git diff` on `content/` empty.
+- **`scripts/check-copy-integrity.mts` makes this permanent.** It asserts that every leaf string in the home copy object appears character for character in the exported home page HTML, and it is in `pnpm check`. It catches a dropped paragraph, a wrapper that swallowed a node, and a string that moved into an attribute where a reader can no longer see it.
+- The check found one real gap on its first run: `home.demo.*`, the SentinelGate block removed from the home page by an earlier decision. Those keys are marked retired in the script rather than reinstated, because removing that section was deliberate. The strings stay in the copy object so the section can come back without being rewritten.
+- The Scene A description, `home.hero.sceneAlt`, moved from an `sr-only` paragraph to Act I's `aria-label`. Same string, byte-identical, read once instead of twice. The spec asks for the canvas to be described rather than hidden, and duplicating the description would have made a screen reader say it twice.
+
+### Architecture
+
+- **Frame sequences, not `<video>`.** Scroll-scrubbing a video element is unreliable: iOS Safari refuses precise `currentTime` seeking on unbuffered ranges, and seeking during scroll judders everywhere. AVIF sequences painted to canvas are deterministic and frame-exact.
+- **Sticky plus negative margin, not a pinning library.** The film layer is `position: sticky` with `margin-bottom: -100svh`, which pins it for the section's duration without affecting layout. `vh` fallbacks are declared first for browsers that do not know `svh`, otherwise the layer collapses to auto height.
+- **The scrub easing is implemented natively rather than with ScrollTrigger.** The spec asks for `scrub: 0.6`, which is a smoothing behaviour, not a scroll-hijacking one: a critically damped follow in the existing rAF loop reproduces it in about ten lines. GSAP plus ScrollTrigger is roughly 50KB gzipped for one easing curve, and the JS budget is the reason this feature is allowed to exist. **Flagged for approval; swapping to ScrollTrigger is a contained change if preferred.**
+- Progress clamps its entry point at scroll zero, so the hero starts its act at frame zero. Without that clamp a section at the top of the document begins around 50% because there is no room above the fold for its run-up.
+- Frames are fetched sparse-first, every eighth then fourth then all, so a quarter-buffered act already scrubs across its full length at reduced temporal resolution. The film resolves in place rather than filling in from the left.
+- At most three acts stay decoded. `ImageBitmap` holds real memory and a page that grows without bound on a corporate laptop is exactly the failure this feature must not introduce.
+- The draw skips when the frame index has not changed. Repainting an identical frame at 120Hz is the single largest source of jank in this pattern.
+
+### Toolchain
+
+- **ffmpeg, avifenc and ImageMagick are not installed on this machine**, so the Appendix B pipeline could not run as written. Replaced with an equivalent that needs no admin rights: ffmpeg 7.1 resolved from the `imageio-ffmpeg` python package, AVIF encoding and luminance measurement through `sharp`. `FFMPEG_PATH` overrides the lookup.
+- **Desktop frames are 1280px, not 1600px.** The supplied footage is 1280x720. Upscaling buys no detail and costs bytes.
+
+### Assets
+
+- **ACT 7 is missing from `/videos`.** Acts 1 to 6 and 8 were supplied. Act VII stays on its placeholder until footage arrives.
+- Placeholder frames are flat vector art and compress roughly two orders of magnitude smaller than graded footage: 0.24MB total against a 7MB budget. The budget check prints a warning saying so, because a green report built on placeholders would be misleading.
+- **Open question before Phase 2: where do the frames live?** Eight acts of real footage is about 7MB of AVIF, regenerated whenever an act is regraded. Committing that to git will bloat the repository quickly. Git LFS or an asset bucket outside the repo should be decided before the first real ingest.
+
+### Legibility
+
+- The contrast audit composites in the browser's order: film at the act's intensity over the void, then the graded scrim, sampled against the **brightest** pixel in the text region rather than its mean, because a single bright filament crossing one line of type is exactly the failure to catch.
+- Act I passes at 4.62:1 for `--ink-400`, the least headroom of any act by a wide margin. That is by design, since Act I is the one allowed to breathe, but real footage is brighter than a placeholder and Act I's scrim will very likely need thickening in Phase 2.
+- The focus ring gained a dark halo underneath. A blue outline over a blue filament is not a focus indicator.
+- `.film-panel` provides the text-block backdrop with a solid `--slate-900` fallback where `backdrop-filter` is unsupported. The fallback is deliberately opaque, never transparent.
+
+### Verification limits
+
+- The Browser pane has not composited a frame for several turns, so rAF is suspended and **the scrub has never been watched**. Structure is verified: eight acts mounted, eight posters, correct tier selection, `pointer-events: none` on every film layer, sticky positioning, and the full check chain green. The scroll feel itself is unverified.
+- The pane resolved to `CINEMA_LIGHT` on its own, because it reports a 3g connection, and mounted canvases for exactly Acts I, IV and VI. That is the specified behaviour confirming itself by accident.
+- The Next dev server intermittently streams an empty shell on this machine. The static export renders correctly, so verification now runs against `out/` through the `kensara-static` launch config rather than against `next dev`.
+
 ## Industries, all six sectors
 
 ### Template
