@@ -59,7 +59,7 @@ export const home = {
       { text: 'DENY · R-207 evidence_freshness', tone: 'refute' as const },
       { text: 'ALLOW · fin-in-v3.1 · 31ms', tone: 'proof' as const },
     ],
-    primaryCta: { label: 'See a decision get gated', href: '#gate' },
+    primaryCta: { label: 'Explore the Sentinel engine', href: '/sentinel/' },
     secondaryCta: { label: 'Read the engineering journal', href: '/journal/' },
     sceneAlt:
       'A drifting cloud of roughly 14,400 reachable system states. Most resolve calm blue. A handful deep inside the cloud are marked as refuted. A thin scanning ray sweeps through and touches 128 of them.',
@@ -92,7 +92,7 @@ export const home = {
 
     groups: [
       {
-        eyebrow: 'FORMUS · PROVING CLAIMS',
+        eyebrow: 'FORMUS · PROVING REQUIREMENTS',
         engine: 'formus' as const,
         rows: [
           {
@@ -130,7 +130,7 @@ export const home = {
             },
             solution: {
               name: 'Property assistant, with a confirmation gate',
-              body: 'Requirements in your own words become formal properties, counter-examples are explained in the vocabulary of the design, and a proof that will not close reports which part failed. The model drafts. A named engineer confirms. Only then does the solver run.',
+              body: 'Requirements in your own words become formal properties, counter-examples are explained in the vocabulary of the design, and a proof that will not close reports which part failed. The model drafts. A named engineer confirms. Only then does the deterministic checker run.',
               readout: 'confirmed_by a.rege · 2 edits · spec locked',
             },
           },
@@ -234,13 +234,13 @@ export const home = {
     rule: { label: 'SYSTEM', value: 'formus · sentinel' },
     h2: 'Two engines. One artifact.',
     formus: {
-      eyebrow: 'FORMUS · CLAIMS',
+      eyebrow: 'FORMUS · REQUIREMENTS',
       title: 'Formus proves.',
-      body: 'Give it a claim and the rules that govern it. It returns PROVEN with the minimal derivation, REFUTED with a concrete counter-example, or REFUSE with a stated reason. Never a confident guess.',
-      hook: '412 rules went in. Four came out.',
-      readout: 'PROVEN · unsat core: 4 of 412 rules · 41ms',
+      body: 'Give it a requirement written in English. It proposes the formal property, a named engineer confirms it, and a deterministic checker decides whether your system satisfies it. Your existing tools prove the code does not crash. This proves it does what the requirement said.',
+      hook: 'Not pass or fail. Which requirement, and the line it breaks on.',
+      readout: 'FIDELITY · 32 implemented · 3 violated · 2 unproven · 1 vacuous',
       gloss:
-        'The unsat core is the minimal set of rules actually responsible for the result, which is also the explanation.',
+        'A proof that passes can still be worthless. The fidelity report says which properties actually constrained the design, and where the rest break.',
       cta: { label: 'Explore Formus', href: '/formus/' },
     },
     sentinel: {

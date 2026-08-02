@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { AssuranceCard } from '@/components/assurance/AssuranceCard';
-import { SentinelGate } from '@/components/demo/SentinelGate';
 import { ProblemMatrix } from '@/components/home/ProblemMatrix';
 import { ShiftDiagram } from '@/components/home/ShiftDiagram';
 import { TranslationBoundary } from '@/components/home/TranslationBoundary';
@@ -169,26 +168,6 @@ export default async function HomePage() {
             </Reveal>
           ))}
         </div>
-      </Section>
-
-      {/* ------------------------------------------------ H6 · the live demo */}
-      <Section id="gate" label={home.demo.rule.label} value={home.demo.rule.value}>
-        <Reveal>
-          <h2 id="gate-demo" className="max-w-[28ch] text-28 sm:text-40">
-            {home.demo.h2}
-          </h2>
-          <Prose className="mt-7">
-            <p>{home.demo.body}</p>
-          </Prose>
-        </Reveal>
-
-        <div className="mt-10">
-          <SentinelGate headingId="gate-demo" />
-        </div>
-
-        <Reveal className="mt-6">
-          <p className="measure text-17 text-ink-400">{home.demo.footnote}</p>
-        </Reveal>
       </Section>
 
       {/* ------------------------------------------------ H7 · the artifact */}
