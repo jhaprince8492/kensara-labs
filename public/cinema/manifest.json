@@ -1,31 +1,31 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-02T04:28:26.735Z",
+  "generatedAt": "2026-08-02T05:09:47.213Z",
   "acts": [
     {
       "act": 1,
-      "frameCount": 72,
+      "frameCount": 48,
       "poster": "/cinema/act01/poster.avif",
-      "posterBytes": 1872,
+      "posterBytes": 28381,
       "desktop": {
         "path": "/cinema/act01/desktop",
-        "bytes": 38231,
+        "bytes": 1140467,
         "width": 1280
       },
       "mobile": {
         "path": "/cinema/act01/mobile",
-        "bytes": 22580,
+        "bytes": 598348,
         "width": 900
       },
-      "meanLuminance": 0.0237,
-      "textColumnPeakLuminance": 0.7451,
+      "meanLuminance": 0.0422,
+      "textColumnPeakLuminance": 0.949,
       "scrim": [
         0.42,
         0.7,
         0.7,
         0.52
       ],
-      "placeholder": true
+      "placeholder": false
     },
     {
       "act": 2,
@@ -79,28 +79,28 @@
     },
     {
       "act": 4,
-      "frameCount": 72,
+      "frameCount": 48,
       "poster": "/cinema/act04/poster.avif",
-      "posterBytes": 2513,
+      "posterBytes": 23105,
       "desktop": {
         "path": "/cinema/act04/desktop",
-        "bytes": 61001,
+        "bytes": 622707,
         "width": 1280
       },
       "mobile": {
         "path": "/cinema/act04/mobile",
-        "bytes": 29923,
+        "bytes": 336734,
         "width": 900
       },
-      "meanLuminance": 0.0252,
-      "textColumnPeakLuminance": 0.1333,
+      "meanLuminance": 0.1233,
+      "textColumnPeakLuminance": 0.9098,
       "scrim": [
         0.45,
         0.78,
         0.78,
         0.55
       ],
-      "placeholder": true
+      "placeholder": false
     },
     {
       "act": 5,
