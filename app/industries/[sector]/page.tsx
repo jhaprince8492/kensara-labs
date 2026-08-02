@@ -21,10 +21,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const sector = findSector(slug);
   if (!sector?.page) return {};
 
-  return {
-    title: sector.name,
-    description: sector.page.failure,
-  };
+  return { title: sector.name, description: sector.page.failure };
 }
 
 export default async function SectorPage({ params }: Params) {
@@ -42,7 +39,83 @@ export default async function SectorPage({ params }: Params) {
         <h1 className="measure mt-6 text-28 sm:text-40 lg:text-60">{page.failure}</h1>
       </section>
 
-      {/* 2 · the regulation */}
+      {/* 2 · the pain, as buyers state it */}
+      <Section label="IN THEIR WORDS" value="the pain">
+        <Reveal>
+          <blockquote className="border-l border-proof/50 pl-6 sm:pl-8">
+            <p className="measure text-21 text-ink-100 sm:text-28">{page.quote.text}</p>
+            <footer className="mono mt-6 text-12 text-ink-500">{page.quote.source}</footer>
+          </blockquote>
+        </Reveal>
+      </Section>
+
+      {/* 3 · why the tools already on the bench miss it */}
+      <Section label="THE BLIND SPOT" value={`${page.blindspot.rows.length} approaches`}>
+        <Reveal>
+          <h2 className="max-w-[24ch] text-28 sm:text-40">Why the tools you have miss it.</h2>
+          <Prose className="mt-7">
+            <p>{page.blindspot.intro}</p>
+          </Prose>
+        </Reveal>
+
+        <Reveal delay={60} className="mt-10 overflow-x-auto">
+          <table className="w-full min-w-[48rem] border-collapse text-left">
+            <thead>
+              <tr className="border-y border-hairline">
+                <th scope="col" className="eyebrow py-3 pr-6">APPROACH</th>
+                <th scope="col" className="eyebrow py-3 pr-6">WHAT IT PROVES</th>
+                <th scope="col" className="eyebrow py-3">WHAT IT MISSES</th>
+              </tr>
+            </thead>
+            <tbody>
+              {page.blindspot.rows.map((row) => (
+                <tr key={row.approach} className="border-b border-hairline">
+                  <td className="py-4 pr-6 align-top text-17 text-ink-100">{row.approach}</td>
+                  <td className="py-4 pr-6 align-top text-14 text-ink-500">{row.proves}</td>
+                  <td className="py-4 align-top text-14 text-ink-100">{row.misses}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Reveal>
+      </Section>
+
+      {/* 4 · what we do here, engine by engine */}
+      <Section label="WHAT WE DO HERE" value={`${page.engines.length} engine${page.engines.length > 1 ? 's' : ''}`}>
+        <Reveal>
+          <h2 className="text-28 sm:text-40">What we do here.</h2>
+        </Reveal>
+
+        <ul className="mt-12 grid gap-px border border-hairline bg-hairline lg:grid-cols-2">
+          {page.engines.map((entry, index) => (
+            <Reveal as="li" key={entry.engine} delay={index * 60} className="bg-slate-900">
+              <div className="h-full p-6 sm:p-8">
+                <span
+                  className={`mono text-12 tracking-[0.14em] ${
+                    entry.engine === 'Formus' ? 'text-proof-ink' : 'text-gate'
+                  }`}
+                >
+                  {entry.engine.toUpperCase()}
+                </span>
+                <h3 className="mt-3 max-w-[24ch] text-21 text-ink-100 sm:text-28">{entry.lead}</h3>
+                <p className="measure mt-5 text-17 text-ink-400">{entry.body}</p>
+              </div>
+            </Reveal>
+          ))}
+        </ul>
+
+        {page.position ? (
+          <Reveal delay={80} className="mt-10">
+            <div className="border border-hairline bg-slate-800 p-6 sm:p-8">
+              <Eyebrow>{page.position.label}</Eyebrow>
+              <h3 className="mt-4 max-w-[24ch] text-21 sm:text-28">{page.position.heading}</h3>
+              <p className="measure mt-5 text-17 text-ink-400">{page.position.body}</p>
+            </div>
+          </Reveal>
+        ) : null}
+      </Section>
+
+      {/* 5 · the regulation */}
       <Section label="REGULATION" value={`${page.regulation.clauses.length} clauses`}>
         <Reveal>
           <h2 className="text-28 sm:text-40">The clauses that govern it.</h2>
@@ -73,7 +146,7 @@ export default async function SectorPage({ params }: Params) {
         </Reveal>
       </Section>
 
-      {/* 3 · three concrete workflows */}
+      {/* 6 · three concrete workflows */}
       <Section label="WORKFLOWS" value="3">
         <Reveal>
           <h2 className="text-28 sm:text-40">Three workflows, and the artifact each leaves.</h2>
@@ -104,23 +177,33 @@ export default async function SectorPage({ params }: Params) {
         </ul>
       </Section>
 
-      {/* 4 · one worked mini-example */}
+      {/* 7 · one worked example, and the object you leave with */}
       <Section label="WORKED EXAMPLE" value="one decision">
         <Reveal>
           <h2 className="text-28 sm:text-40">One decision, in full.</h2>
         </Reveal>
-        <Reveal delay={60} className="mt-10 max-w-[46rem]">
-          <WorkedExample
-            chip={page.example.chip}
-            eyebrow={page.example.eyebrow}
-            question={page.example.question}
-            lines={page.example.lines}
-            result={page.example.result}
-          />
-        </Reveal>
+
+        <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,46rem)_1fr] lg:gap-12">
+          <Reveal>
+            <WorkedExample
+              chip={page.example.chip}
+              eyebrow={page.example.eyebrow}
+              question={page.example.question}
+              lines={page.example.lines}
+              result={page.example.result}
+            />
+          </Reveal>
+
+          <Reveal delay={60} className="self-start">
+            <div className="border border-proof/40 bg-proof/8 p-6">
+              <Eyebrow>{page.walkaway.label}</Eyebrow>
+              <p className="mt-4 text-17 text-ink-100">{page.walkaway.detail}</p>
+            </div>
+          </Reveal>
+        </div>
       </Section>
 
-      {/* 5 · the boundary */}
+      {/* 8 · the boundary */}
       <Section label="BOUNDARY" value={`${page.boundary.items.length} limits`}>
         <Reveal>
           <h2 className="text-28 sm:text-40">{page.boundary.intro}</h2>
@@ -134,7 +217,7 @@ export default async function SectorPage({ params }: Params) {
         </ul>
       </Section>
 
-      {/* 6 · cta */}
+      {/* 9 · cta */}
       <Section label="NEXT" value="45 min" className="pb-8">
         <Reveal>
           <CTABlock

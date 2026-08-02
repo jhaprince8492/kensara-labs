@@ -4,7 +4,7 @@ import { CTABlock } from '@/components/layout/CTABlock';
 import { Eyebrow } from '@/components/primitives/Eyebrow';
 import { Reveal } from '@/components/primitives/Reveal';
 import { Section } from '@/components/primitives/Section';
-import { sectors } from '@/content/data/industries';
+import { sectors, throughLine } from '@/content/data/industries';
 
 export const metadata: Metadata = {
   title: 'Industries',
@@ -20,9 +20,15 @@ export default function IndustriesPage() {
         <h1 className="mt-6 max-w-[20ch] text-40 sm:text-60">
           The failure mode is different. The instrument is the same.
         </h1>
-        <p className="measure mt-7 text-17 text-ink-400 sm:text-21">
-          Each page states the sector’s specific failure mode, the clauses that govern it, three
-          workflows with the engine named, one worked example, and what we do not do there.
+
+        {/* The load-bearing line: six sectors are surface expressions of two engines. */}
+        <p className="measure mt-8 text-21 text-ink-100 sm:text-28">{throughLine}</p>
+
+        <p className="measure mt-6 text-17 text-ink-400">
+          Each page states the sector’s specific failure mode in the words buyers use, why the
+          tools already on the bench miss it, the clauses that govern it, three workflows with the
+          engine named, one worked example, the object you leave holding, and what we do not do
+          there.
         </p>
       </section>
 

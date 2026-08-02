@@ -288,7 +288,7 @@ export const home = {
       {
         name: 'Aerospace & defence',
         standards: 'DO-178C / DO-333',
-        href: '/industries/#aerospace-defence',
+        href: '/industries/aerospace-defence/',
       },
       {
         name: 'Healthcare',
@@ -303,12 +303,12 @@ export const home = {
       {
         name: 'Automotive',
         standards: 'ISO 26262',
-        href: '/industries/#automotive-mobility',
+        href: '/industries/automotive-mobility/',
       },
       {
         name: 'Semiconductors',
         standards: 'firmware root-of-trust',
-        href: '/industries/#semiconductors',
+        href: '/industries/semiconductors/',
       },
       {
         name: 'Regulated SaaS',
