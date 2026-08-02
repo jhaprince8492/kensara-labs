@@ -99,3 +99,35 @@ tension with itself. One line each, newest phase last.
 
 - The Browser pane was not compositing frames during this phase, so the three live scenes were verified structurally (typecheck, clean production build, seeded-generator assertions, zero console errors, correct still fallbacks and text equivalents) and **not visually**. A human pass on the animation itself is outstanding.
 - Running `next build` while `next dev` shares `.next` produces a half-written manifest that passed every budget. `check-bundle` now rejects a manifest with fewer than ten routes or an implausibly small initial bundle.
+
+## Homepage rebuild
+
+### The headline
+
+- The requested line, "provably 100% correct", was not shipped. It is the same class of warranty statement as the banned "guarantees 100% compliance", and it contradicts `REFUSE`, which `/formus` leads with. Shipped instead: **"Software that decides and acts on its own authority has to be provably correct, not probably correct."** Same force, no warranty, and it states the blueprint's central idea in six words.
+- The 100% claim survives as a mechanism rather than a promise, in the hero's second line: "Every consequential action is checked against compiled policy before it executes. No exceptions, no sampling."
+- The hero drops to `text-60` from `text-88`. The new headline is 100 characters against the old 62, and at 88px it filled the viewport before the sub-line was reached.
+
+### The problem matrix (new H3)
+
+- All four problems from the reference slide are carried with their own names: state-space explosion, proof brittleness, expertise shortage, environment constraints. Four Sentinel problems were added alongside them, because the slide's four are all Formus problems and a homepage that lists them alone proves half the company.
+- **Problems and solutions are separated by ground and elevation, not by colour.** The reference uses orange against green; orange is not a token here and green already means the gate is enforcing. The problem sits flat on `--void`, the answer is raised onto `--slate-800`. The only hue in a row is its mono readout, which is a real verdict, so colour still means what it means everywhere else.
+- Icons are replaced by eight pairs of hairline failure glyphs, each a miniature of the geometry the row is about. A lightbulb beside "expertise shortage" is exactly the stock iconography the blueprint bans. Roughly 5KB of inline SVG, static, server-rendered, all `aria-hidden` so a PDF export loses nothing.
+- Markup is a `<dl>` per group with the problem as `<dt>` and the answer as `<dd>`, so the pairing reaches a screen reader without an ARIA table.
+- The old "cost" section is absorbed: its four failure modes are now `REAL COST` lines inside the matrix, permanently visible instead of hidden behind hover.
+- `assumptions: 14 inferred · 14 validated · 0 unstated` is the one readout in the matrix not drawn from something already built. Flagged for replacement with the real shape.
+
+### Other changes
+
+- **The demo lands on a decision.** The default scenario is evaluated on mount and shown already settled, with no animation and no screen-reader announcement. Previously the panel read "No decision yet", which meant every screenshot, PDF export and non-clicking visitor saw a blank where the highest-converting component should be.
+- Changing an input now marks the decision `stale` and keeps it on screen behind a notice, rather than blanking the panel and returning it to the empty state.
+- The demo is promoted from an `h3` inside the engines section to its own section with its own rule strip.
+- `unsat core` and `Assurance Object` are each glossed in one line at first use on the home page.
+- The two diagram captions ("Five paths you can list. A space you cannot." and "The model drafts. A human confirms. The solver decides.") moved from 12px `--ink-500` to 17px `--ink-100`. They were the clearest sentences in their sections and were set to be ignored.
+- Every industry tile is now a link. The three sectors without pages anchor to their card on the hub instead of going nowhere.
+- The journal is promoted to the hero's secondary CTA. It is the investor path and it was the least prominent link on the page.
+
+### Cost
+
+- Home initial JS 113.5KB gzip (was 112.9), home total 151.4KB gzip (was 142.7). Both well inside budget.
+- The page is longer: roughly nine screens at a 1440x900 desktop against six before. The matrix is about 1,900px of that. If it needs to come down, the cheapest cut is H2, whose argument is now carried by the matrix's `REAL COST` lines.
