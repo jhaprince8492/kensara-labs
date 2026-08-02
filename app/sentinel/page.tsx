@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { SentinelGate } from '@/components/demo/SentinelGate';
 import { CTABlock } from '@/components/layout/CTABlock';
 import { LedgerTick } from '@/components/layout/LedgerTick';
-import { PipelineStrip } from '@/components/pipeline/PipelineStrip';
 import { Eyebrow } from '@/components/primitives/Eyebrow';
 import { Prose } from '@/components/primitives/Prose';
 import { Reveal } from '@/components/primitives/Reveal';
@@ -106,17 +105,6 @@ export default function SentinelPage() {
             </Reveal>
           ))}
         </ul>
-      </Section>
-
-      {/* pipeline */}
-      <Section label={sentinel.pipeline.rule.label} value={sentinel.pipeline.rule.value}>
-        <Reveal>
-          <h2 className="text-28 sm:text-40">{sentinel.pipeline.h2}</h2>
-          <p className="measure mt-5 text-17 text-ink-400">{sentinel.pipeline.body}</p>
-        </Reveal>
-        <div className="mt-10">
-          <PipelineStrip stages={sentinel.pipeline.stages} accent="gate" />
-        </div>
       </Section>
 
       {/* latency */}
