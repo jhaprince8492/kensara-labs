@@ -12,7 +12,12 @@
     "lint": "eslint .",
     "bundle": "node scripts/check-bundle.mjs",
     "scenes": "node --experimental-strip-types scripts/check-scenes.mts",
-    "check": "pnpm typecheck && pnpm lint && pnpm scenes && pnpm build && pnpm bundle"
+    "placeholders": "node --experimental-strip-types scripts/gen-placeholders.mts",
+    "ingest-act": "node --experimental-strip-types scripts/ingest-act.mts",
+    "cinema:budget": "node --experimental-strip-types scripts/check-cinema-budget.mts",
+    "cinema:contrast": "node --experimental-strip-types scripts/contrast-audit.mts",
+    "copy:integrity": "node --experimental-strip-types scripts/check-copy-integrity.mts",
+    "check": "pnpm typecheck && pnpm lint && pnpm scenes && pnpm cinema:budget && pnpm cinema:contrast && pnpm build && pnpm bundle && pnpm copy:integrity"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.0",
@@ -37,6 +42,7 @@
     "@types/three": "^0.185.1",
     "eslint": "^9.18.0",
     "eslint-config-next": "15.5.22",
+    "sharp": "^0.35.3",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.7.3"
   }
