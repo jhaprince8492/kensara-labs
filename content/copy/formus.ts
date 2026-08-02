@@ -1,203 +1,399 @@
 import type { PipelineStage } from '@/components/pipeline/PipelineStrip';
+import type { VerdictKind } from '@/components/primitives/VerdictChip';
+
+/**
+ * Formus page copy.
+ *
+ * Formus automates the step every other verification tool assumes has already
+ * happened: getting a requirement written in English into a formal property.
+ * It sits above the solvers and feeds them. Nothing on this page should read as
+ * a claim to replace a formal environment a team already owns.
+ *
+ * No em dashes.
+ */
+
+export interface FidelityRow {
+  id: string;
+  requirement: string;
+  status: Extract<VerdictKind, 'IMPLEMENTED' | 'VIOLATED' | 'UNPROVEN' | 'VACUOUS'>;
+  /** Where it breaks. Empty when it holds. */
+  location: string;
+}
+
+export interface ChainStep {
+  actor: string;
+  authority: string;
+  action: string;
+  output: string;
+}
 
 export const formus = {
   meta: {
     title: 'Formus',
     description:
-      'Formus takes a claim and the rules that govern it, and returns a verdict with a minimal, replayable proof, or an honest refusal.',
+      'Formus turns a requirement written in English into a formal property, checks your system against it deterministically, and emits signed evidence mapped to the clause.',
   },
 
+  // ------------------------------------------------------------------- hero
   hero: {
-    eyebrow: 'FORMUS · CLAIMS · P2 PROOF PATH',
-    h1: ['Prove the claim.', 'Show the derivation.', 'Ship the evidence.'],
-    sub: 'Formus takes a claim and the rules that govern it, and returns a verdict with a minimal, replayable proof, or an honest refusal.',
-    readout: 'PROVEN · unsat core: 4 of 412 rules · z3 4.13.0 · 41ms',
+    eyebrow: 'FORMUS · REQUIREMENT TO PROOF · SAFETY-CRITICAL',
+    h1: [
+      'Your tools prove the code does not crash.',
+      'Formus proves it does what the requirement said.',
+    ],
+    sub: 'A requirement written in English becomes a formal property, your system is checked against it deterministically, and the evidence comes out signed and mapped to the clause your assessor is looking for.',
+    readout: '38 requirements · 32 implemented · 3 violated · 2 unproven · 1 vacuous',
   },
 
-  verdicts: {
-    rule: { label: 'VERDICT SPACE', value: '3 outcomes' },
-    h2: 'What a verdict actually is.',
-    intro:
-      'Three outcomes, and the one worth reading first is the one most systems cannot produce.',
+  // -------------------------------------------------------------- the gap
+  gap: {
+    rule: { label: 'THE GAP', value: 'conformance' },
+    h2: 'Crash-free is not correct.',
+    body: [
+      'Static analysers and formal tools answer one question well: does this code have a runtime error. No overflow, no null dereference, no division by zero, no state that faults. That is a real property and it is worth having.',
+      'It is not the property your requirement was about. A pump that never crashes and arms both timers in the same cycle has passed every one of those checks. The distance between "does not fault" and "does what was specified" is where recalls live, and nothing in the standard toolchain closes it.',
+    ],
     panels: [
       {
-        chip: 'REFUSE' as const,
-        title: 'It says so when it does not know.',
-        body: 'Solver budget exceeded, a vocabulary gap, or an inconsistent slice of the rule base. Formus states which, and stops. A system that answers everything has told you nothing about the answers you should trust.',
-        readout: 'REFUSE · vocabulary gap · works_contract undefined in pack gst-in-v2.2',
+        label: 'WHAT THE TOOLS PROVE',
+        title: 'Absence of runtime errors',
+        items: [
+          'no arithmetic overflow',
+          'no null or out-of-bounds access',
+          'no division by zero',
+          'no reachable fault state',
+        ],
+        tone: 'muted' as const,
       },
       {
-        chip: 'PROVEN' as const,
-        title: 'The goal is entailed, and the core is the explanation.',
-        body: 'Formus returns the minimal set of rules that were actually responsible. That set is the derivation an auditor reads, and it is small enough to read.',
-        readout: 'PROVEN · unsat core: 4 of 412 rules · 41ms',
-      },
-      {
-        chip: 'REFUTED' as const,
-        title: 'The claim is false, and here is the input that breaks it.',
-        body: 'Not a confidence score. A concrete counter-model: the exact assignment of values under which the claim fails, ready to become a test case.',
-        readout: 'REFUTED · counter-model · category = club_membership',
+        label: 'WHAT NOBODY PROVES',
+        title: 'Conformance to the requirement',
+        items: [
+          'the interlock actually holds, in every reachable state',
+          'the timing bound is met, not merely tested',
+          'the mode transition is recoverable three inputs deep',
+          'the requirement was implemented at all',
+        ],
+        tone: 'proof' as const,
       },
     ],
   },
 
+  // --------------------------------------------------------- the bottleneck
+  bottleneck: {
+    rule: { label: 'THE BOTTLENECK', value: 'authoring' },
+    h2: 'Every verification tool starts after the property already exists.',
+    body: [
+      'Point any of them at your system and the first thing they need is a formal property. Somebody writes that by hand: a person fluent in temporal logic, reading a requirements document and translating it one line at a time, deciding as they go what the sentence actually meant.',
+      'That step has never been automated. It is why formal verification stayed inside aerospace and silicon for fifty years, and it is not a solver problem. It is an authoring problem, and it is the layer Formus owns.',
+    ],
+    readout: 'requirement → property · still manual in every tool on the market',
+  },
+
+  // ------------------------------------------------------------- the chain
   pipeline: {
     rule: { label: 'PIPELINE', value: '8 stages · ordered' },
-    h2: 'Intake to rendered evidence.',
-    body: 'Eight stages, genuinely ordered. The language model appears once, at stage two, and it is advisory there and nowhere else.',
+    h2: 'From the requirements document to the signed object.',
+    body: 'Eight stages, genuinely ordered. A language model appears once, at stage two, where it drafts and has no authority.',
     stages: [
       {
-        name: 'Intake and claim cache',
-        does: 'Normalises the question, resolves the governing rule set, and checks whether this exact claim has been proven before.',
-        emits: 'claim_id · pack refs · cache verdict',
-        worked: 'claim_id 4b1e9c · pack:gst-in-v2.2 · cache MISS',
+        name: 'Requirement intake',
+        does: 'Ingests the requirements document, normalises each requirement to a single testable statement, and assigns the identifier the evidence will be filed under.',
+        emits: 'requirement set · ids · source references',
+        worked: 'REQ-PMP-0114 · SRS v4.2 §5.5.1 · 38 requirements in scope',
       },
       {
-        name: 'Formalizer (advisory model, gated)',
-        does: 'Drafts a candidate specification in KVL from the requirement text. This is the only stage a language model touches, and its output is not authoritative.',
-        emits: 'candidate spec · confidence · vocabulary gaps',
-        worked: 'draft: eligible(itc, invoice) :- registered(supplier), used_in_business(good)',
+        name: 'Property drafting (advisory model)',
+        does: 'Proposes a formal property for the requirement. This is the only stage a language model touches, and its output is a proposal, not a decision.',
+        emits: 'candidate property · vocabulary gaps · confidence',
+        worked: 'draft: G !(arm(t1) & arm(t2))',
       },
       {
         name: 'Confirmation gate',
-        does: 'Renders the draft back in plain English and requires a human to approve or edit it before anything is proven.',
-        emits: 'confirmed spec · approver identity',
-        worked: 'confirmed_by a.rege · 2 edits · spec locked',
+        does: 'Renders the proposal back in the engineer’s own vocabulary, not in logic notation, and requires a named human to approve or edit it. Nothing proceeds until they do.',
+        emits: 'confirmed property · approver identity · edit history',
+        worked: 'confirmed_by a.rege · 2 edits · property locked',
       },
       {
-        name: 'Retrieval and closure',
-        does: 'Pulls the clauses and facts the specification references, then closes over what those references pull in, so the slice is complete rather than convenient.',
-        emits: 'fact set · clause set · closure proof',
-        worked: 'closure: s.16, s.17(5), rule 42 · 412 rules in slice',
+        name: 'Compilation to KVL',
+        does: 'Compiles the confirmed property into the intermediate representation and selects the targets it will be emitted to.',
+        emits: 'compiled logic · target list · content hash',
+        worked: 'kvl/1.4 · targets: SVA, ACSL, native · hash c81b04e2',
       },
       {
-        name: 'Proof engine',
-        does: 'Routes the claim to the solver whose shape it fits and runs it under a fixed budget.',
-        emits: 'sat / unsat / unknown · certificate',
-        worked: 'z3 4.13.0 · UNSAT in 41ms',
+        name: 'Environment and assumption modelling',
+        does: 'Infers the assumptions the check needs about everything outside the unit under verification, then validates them against the interface contracts.',
+        emits: 'assumption set · validation result',
+        worked: 'assumptions: 14 inferred · 14 validated · 0 unstated',
       },
       {
-        name: 'Proof minimisation',
-        does: 'Reduces the certificate to the minimal set of rules that were actually responsible for the result.',
-        emits: 'unsat core',
-        worked: 'core: R-0087, R-0141, R-0302, R-0398',
+        name: 'Deterministic checking',
+        does: 'Checks the system against the compiled logic. No model, no sampling, no heuristic. Where the property fails, the checker returns the state that reaches the failure.',
+        emits: 'verdict · counter-example · location',
+        worked: 'VIOLATED · pump_ctl.c:214 · cycle 3 · both timers armed',
       },
       {
-        name: 'Provenance resolution',
-        does: 'Binds every rule in the core back to its source clause, version and effective date.',
-        emits: 'clause citations · pack versions',
-        worked: 'R-0141 → CGST s.17(5)(b) · effective 2023-10-01',
+        name: 'Fidelity scoring',
+        does: 'Mutates the design and re-checks, and tests whether the property constrained anything at all. This is how you find out the proof was worth having.',
+        emits: 'mutation kill ratio · vacuity flags · per-requirement status',
+        worked: 'mutation kill 47 of 52 · 1 property vacuous',
       },
       {
-        name: 'Deterministic renderer',
-        does: 'Renders the answer and the assurance object from the certificate. Same certificate in, same bytes out, on any machine.',
-        emits: 'answer · assurance object · content hash',
-        worked: 'render: canonical · sha-256 9f2c14a8…',
+        name: 'Evidence rendering',
+        does: 'Renders the assurance object from the certificate and binds it to the clause it is being submitted against. Same inputs, same bytes, on any machine.',
+        emits: 'assurance object · clause binding · content hash',
+        worked: 'IEC 62304 5.5 · sha-256 9f2c14a8… · replay ✓',
       },
     ] satisfies PipelineStage[],
   },
 
-  confirmation: {
-    rule: { label: 'CONTROL', value: 'human in the path' },
-    h2: 'The model drafts the specification. A human confirms it. Only then does the solver run.',
-    body: 'This is the step that makes AI-assisted formal methods credible rather than alarming. The draft is shown back in the engineer’s own vocabulary, not in logic notation, and nothing proceeds until someone with a name approves it. The approval is recorded in the assurance object.',
-    claimLabel: 'CLAIM · AS WRITTEN',
-    claim: 'Input tax credit is available on the office air-conditioning units purchased in March.',
-    renderedLabel: 'SPECIFICATION · RENDERED BACK IN PLAIN ENGLISH',
-    rendered:
-      'Credit is available when the supplier is registered, the invoice is on record, the goods are used in the course of business, and the category is not one of the blocked categories in section 17(5).',
-    actions: ['Approve this specification', 'Edit the specification'],
+  // ----------------------------------------------------------- who decides
+  authority: {
+    rule: { label: 'AUTHORITY', value: 'who decides what' },
+    h2: 'The model proposes. A deterministic checker and a named human decide.',
+    body: 'That division is the whole certifiability argument, so it is worth being exact about it. Three actors touch a property, and only two of them have any authority.',
+    steps: [
+      {
+        actor: 'Advisory model',
+        authority: 'none',
+        action: 'Reads the requirement and proposes a formal property.',
+        output: 'a proposal, discarded if the human rejects it',
+      },
+      {
+        actor: 'Named engineer',
+        authority: 'decides what the requirement meant',
+        action: 'Reads the proposal rendered in plain English and approves or edits it.',
+        output: 'a confirmed property, and their name on it',
+      },
+      {
+        actor: 'Deterministic checker',
+        authority: 'decides whether the system satisfies it',
+        action: 'Checks the system against the compiled logic. Same inputs, same verdict, every time.',
+        output: 'the verdict, and the state that breaks it',
+      },
+    ] satisfies ChainStep[],
+    closing:
+      'The authoritative path contains no language model. Verdicts come from a checker, not from a generation, and the engineer who confirmed the property is recorded in the object alongside it.',
   },
 
-  minimisation: {
-    rule: { label: 'MINIMISATION', value: '412 → 4' },
-    h2: '412 rules went in. Four came out.',
-    body: 'The proof is not the whole rule base. It is the minimal set that was actually responsible, which is also, conveniently, the explanation. An auditor reads four rules, not four hundred.',
-    readout: 'unsat core · R-0087 · R-0141 · R-0302 · R-0398',
-  },
-
-  worked: {
-    rule: { label: 'WORKED EXAMPLE', value: '3 outcomes · 1 claim' },
-    h2: 'One claim, all three outcomes.',
-    body: 'The same question, asked three ways. Showing where a system stops is more convincing than three happy paths.',
-    cases: [
-      {
-        chip: 'PROVEN' as const,
-        eyebrow: 'CGST · s.16, s.17(5)',
-        question: 'Is input tax credit available on the office air-conditioning units?',
-        lines: [
-          'registered(supplier)              ✓ GSTIN on record',
-          'invoice_on_record(inv_88214)      ✓ matched in GSTR-2B',
-          'used_in_business(goods)           ✓ declared use: office',
-          'blocked_category(air_conditioner) ✗ not in s.17(5) list',
-          'z3 4.13.0                         UNSAT in 41ms',
-        ],
-        result: 'PROVEN · unsat core: 4 of 412 rules · cited s.16(2), s.17(5)(d)',
-      },
-      {
-        chip: 'REFUTED' as const,
-        eyebrow: 'CGST · s.17(5)(b)',
-        question: 'Is input tax credit available on the club membership renewed in March?',
-        lines: [
-          'registered(supplier)              ✓ GSTIN on record',
-          'invoice_on_record(inv_88907)      ✓ matched in GSTR-2B',
-          'blocked_category(club_membership) ✓ listed in s.17(5)(b)',
-          'z3 4.13.0                         SAT in 12ms',
-        ],
-        result: 'REFUTED · counter-model: category = club_membership · cited s.17(5)(b)',
-      },
-      {
-        chip: 'REFUSE' as const,
-        eyebrow: 'CGST · vocabulary gap',
-        question: 'Is input tax credit available on the works contract for the new warehouse?',
-        lines: [
-          'registered(supplier)              ✓ GSTIN on record',
-          'works_contract(subject)           ? not defined in pack gst-in-v2.2',
-          'closure                           incomplete',
-          'z3 4.13.0                         not invoked',
-        ],
-        result: 'REFUSE · vocabulary gap · works_contract undefined · no verdict issued',
-      },
+  // -------------------------------------------------------- fidelity report
+  fidelity: {
+    rule: { label: 'FIDELITY', value: 'was the proof worth having' },
+    h2: 'A proof that passes can still be worthless. We tell you which ones.',
+    body: [
+      'Every other tool in this market reports pass or fail. None of them report whether the property you proved was strong enough to be worth proving. A property whose antecedent is never true in the reachable space passes instantly and constrains nothing, and it will sit in your evidence pack looking exactly like a real result.',
+      'Formus mutates the design and re-checks to see how much the property actually catches, and tests each property for vacuity. The output is a requirement-by-requirement statement of what is implemented, what is not, and exactly where it breaks.',
     ],
-  },
-
-  solvers: {
-    rule: { label: 'ROUTING', value: 'by claim shape' },
-    h2: 'Solver selection is an optimisation problem, not your problem.',
-    body: 'Claims are routed by shape, deterministically, and the routing is recorded. You do not pick a solver, and the same claim never lands on a different one.',
+    summaryLabel: 'FIDELITY REPORT · SRS v4.2 · 38 REQUIREMENTS',
+    summary: [
+      { status: 'IMPLEMENTED' as const, count: 32, note: 'holds in every reachable state' },
+      { status: 'VIOLATED' as const, count: 3, note: 'counter-example located' },
+      { status: 'UNPROVEN' as const, count: 2, note: 'budget or vocabulary, reason stated' },
+      { status: 'VACUOUS' as const, count: 1, note: 'passed without constraining anything' },
+    ],
+    score: 'mutation kill 47 of 52 · vacuity 1 flagged · coverage 38 of 38 requirements attempted',
+    rowsLabel: 'PER REQUIREMENT',
     rows: [
-      { engine: 'z3', shape: 'SMT · arithmetic, arrays, quantifier-light slices' },
-      { engine: 'cvc5', shape: 'SMT · strings and datatypes' },
-      { engine: 'soufflé', shape: 'datalog · large fact closures' },
-      { engine: 'lean', shape: 'proof terms · results that must be checked independently' },
+      {
+        id: 'REQ-PMP-0114',
+        requirement: 'The pump shall not arm both infusion timers within the same control cycle.',
+        status: 'IMPLEMENTED' as const,
+        location: '',
+      },
+      {
+        id: 'REQ-PMP-0119',
+        requirement: 'A bolus request during occlusion shall be rejected before the valve opens.',
+        status: 'VIOLATED' as const,
+        location: 'pump_ctl.c:214 · cycle 3 · valve opens before occlusion flag is read',
+      },
+      {
+        id: 'REQ-PMP-0122',
+        requirement: 'On battery fault the pump shall enter safe hold within 200ms.',
+        status: 'VACUOUS' as const,
+        location: 'antecedent never true in the reachable space · property needs rewriting',
+      },
+      {
+        id: 'REQ-PMP-0130',
+        requirement: 'Cumulative delivered volume shall never exceed the prescribed limit.',
+        status: 'UNPROVEN' as const,
+        location: 'budget 120s exceeded at depth 14 · no verdict issued',
+      },
+    ] satisfies FidelityRow[],
+    footnote:
+      'Two of those four are things no other tool on your bench would have told you. The vacuous one would have shipped as a pass.',
+  },
+
+  // -------------------------------------------------------- worked example
+  worked: {
+    rule: { label: 'WORKED EXAMPLE', value: 'one requirement · end to end' },
+    h2: 'One requirement, all the way through.',
+    body: 'A Class C infusion pump, the requirement as it was written in the specification document, and every artifact the chain produced from it.',
+    steps: [
+      {
+        label: 'REQUIREMENT · AS WRITTEN',
+        actor: 'SRS v4.2 §5.5.1',
+        content: 'The pump shall not arm both infusion timers within the same control cycle.',
+        mono: false,
+      },
+      {
+        label: 'PROPOSAL · ADVISORY MODEL',
+        actor: 'not authoritative',
+        content: 'G !(arm(t1) & arm(t2))',
+        mono: true,
+      },
+      {
+        label: 'CONFIRMATION · RENDERED BACK IN PLAIN ENGLISH',
+        actor: 'a.rege',
+        content:
+          'At no point in the run are both timers armed at the same time. Approved after two edits: "control cycle" was bound to the scheduler tick, not to the ISR.',
+        mono: false,
+      },
+      {
+        label: 'COMPILED LOGIC · KVL',
+        actor: 'kvl/1.4',
+        content: 'always !(arm[t1] && arm[t2]) @ tick',
+        mono: true,
+      },
+      {
+        label: 'ASSUMPTIONS · INFERRED AND VALIDATED',
+        actor: 'environment',
+        content: 'tick monotonic · ISR cannot preempt tick · 14 inferred · 14 validated',
+        mono: true,
+      },
+      {
+        label: 'CHECK · DETERMINISTIC',
+        actor: 'no model on this path',
+        content: 'PROVEN · exhaustive over the reachable space · 41ms · core 4 of 412',
+        mono: true,
+      },
+      {
+        label: 'FIDELITY',
+        actor: 'was it worth proving',
+        content: 'mutation kill 12 of 12 · not vacuous · property constrains the design',
+        mono: true,
+      },
+      {
+        label: 'EVIDENCE · SIGNED AND BOUND',
+        actor: 'IEC 62304 5.5',
+        content: 'assurance object · sha-256 9f2c14a8… · replay ✓',
+        mono: true,
+      },
     ],
-    outputsLabel: 'OUTPUT FORMATS AUDITORS ALREADY ACCEPT',
-    outputs: ['SVA', 'ACSL', 'TLA+'],
+    variants: [
+      {
+        chip: 'VIOLATED' as const,
+        eyebrow: 'SAME PUMP · REQ-PMP-0119',
+        question:
+          'A bolus request arriving during an occlusion shall be rejected before the valve opens.',
+        lines: [
+          'property      G (occlusion -> !valve_open U bolus_rejected)',
+          'confirmed_by  a.rege · 0 edits',
+          'check         VIOLATED in 96ms',
+          'counter-example  cycle 3 · occlusion set at t=2, valve opens at t=3',
+          'location      pump_ctl.c:214 · flag read after the actuation call',
+          'fidelity      mutation kill 9 of 11 · not vacuous',
+        ],
+        result: 'VIOLATED · the state that reaches it, and the line that causes it',
+      },
+      {
+        chip: 'UNPROVEN' as const,
+        eyebrow: 'SAME PUMP · REQ-PMP-0130',
+        question: 'Cumulative delivered volume shall never exceed the prescribed limit.',
+        lines: [
+          'property      G (delivered <= prescribed)',
+          'confirmed_by  a.rege · 1 edit',
+          'check         budget 120s exceeded at depth 14',
+          'reason        unbounded accumulator · needs an inductive invariant',
+          'verdict       none issued',
+          'next          the invariant is a two-line addition, and we will say so',
+        ],
+        result: 'UNPROVEN · stated reason, no verdict, nothing filed as evidence',
+      },
+    ],
   },
 
-  kvl: {
-    rule: { label: 'IR', value: 'kvl' },
-    h2: 'You never write KVL. That’s the point.',
-    body: 'KVL is the intermediate representation every requirement compiles into, the way a compiler has an IR. It exists so that one specification can target four solvers and three certification output formats without being rewritten three times. Engineers read it during confirmation. Nobody authors it.',
+  // ---------------------------------------------------------- the evidence
+  evidence: {
+    rule: { label: 'EVIDENCE', value: 'mapped to the clause' },
+    h2: 'The evidence pack stops being a nine-month project.',
+    body: [
+      'Certification evidence today is assembled by hand, usually by contractors, in documents and spreadsheets, after the engineering is finished. It takes months, it costs more than the verification did, and the artifact it produces is a description of work rather than the work itself.',
+      'Formus emits the evidence as the check runs. Each object binds the requirement, the confirmed property, the verdict and its certificate, and the exact clause it is being submitted against. Your assessor verifies it locally. There is nothing of ours to trust and no service to call.',
+    ],
+    clauses: [
+      { standard: 'IEC 62304', clause: '5.5', satisfies: 'software unit verification' },
+      { standard: 'IEC 62304', clause: '5.7.3', satisfies: 'software system testing evidence' },
+      { standard: 'DO-178C', clause: 'Table A-4', satisfies: 'verification of low-level requirements' },
+      { standard: 'DO-333', clause: 'FM.6.3.1', satisfies: 'formal analysis in place of review' },
+      { standard: 'ISO 26262', clause: '6-9', satisfies: 'verification of software unit design' },
+      { standard: 'ISO 14971', clause: '7.1', satisfies: 'risk control verification' },
+    ],
   },
 
-  applies: {
-    rule: { label: 'DEPLOYMENT', value: 'where formus applies' },
-    h2: 'Where Formus applies.',
+  // ------------------------------------------------------- continuous proof
+  continuous: {
+    rule: { label: 'CONTINUOUS PROOF', value: 'during development' },
+    h2: 'A proof is not a milestone. It is a thing that decays.',
+    body: [
+      'Formal verification is usually run once, near submission. The first meaningful code change after that breaks the proofs, re-establishing them costs more each time, and teams that adopted it as an event tend to stop somewhere around month six.',
+      'Formus repairs proofs on every change, during development, not at freeze. A commit arrives, the affected properties are re-derived against the recorded intent, and the ones that genuinely need a human are the only ones that reach one.',
+    ],
+    readout:
+      'commit 8c14ef2a · 34 properties re-derived · 2 require confirmation · 41s',
+    note: 'Adopt it before submission, not after the code freeze. A proof that arrives at the end is a document. A proof that survives every commit is a control.',
+  },
+
+  // -------------------------------------------------------------- domains
+  domains: {
+    rule: { label: 'WHERE FORMUS RUNS', value: '3 domains' },
+    h2: 'Where Formus runs.',
     items: [
-      { sector: 'Aerospace & defence', use: 'DO-178C and DO-333 credit, mode logic, FDIR' },
-      { sector: 'Healthcare & life sciences', use: 'IEC 62304 class C timing and interlock logic' },
-      { sector: 'Automotive', use: 'ISO 26262 arbitration and battery state safety' },
-      { sector: 'Semiconductors', use: 'firmware root-of-trust, cross-die interoperability' },
-      { sector: 'Financial services', use: 'regulated answers with a citable derivation' },
+      {
+        name: 'Safety-critical software',
+        eyebrow: 'MEDICAL · AVIONICS · AUTOMOTIVE · RAIL',
+        body: 'The requirement-to-property step here is entirely manual today, and the evidence pack behind it is assembled by hand. Both are what Formus produces. Interlocks, timing bounds, mode logic and state machines are exactly the shape of property a deterministic checker closes well.',
+        standards: ['IEC 62304', 'ISO 13485', 'DO-178C', 'DO-333', 'ISO 26262', 'EN 50128'],
+        readout: 'PROVEN · REQ-PMP-0114 · bound to IEC 62304 5.5',
+      },
+      {
+        name: 'Sovereign defence and space',
+        eyebrow: 'CEMILAC · DRDO · DDPMAS-2002',
+        body: 'The verification pain is the same, and the procurement position is not. Foreign verification tooling carries export-control and trust friction that makes it awkward or impossible to place inside a programme. Formus is a domestic option that is allowed in the building, with the same evidence output.',
+        standards: ['DDPMAS-2002', 'DO-178C', 'DO-333'],
+        readout: 'on-premises · air-gapped · no outbound path',
+      },
+      {
+        name: 'Semiconductor and hardware',
+        eyebrow: 'RTL · FIRMWARE · ROOT OF TRUST',
+        body: 'This is not a market we are entering. It is a flow we sit above. Assertion authoring is still manual inside every hardware verification environment on the bench, so Formus takes the requirement and emits the assertion into the environment you already run.',
+        standards: ['SVA', 'firmware root-of-trust', 'cross-die interoperability'],
+        readout: 'emitted: 214 assertions · into your existing flow',
+      },
     ],
   },
 
+  // ------------------------------------------------------- any solver + kvl
+  compatibility: {
+    rule: { label: 'COMPATIBILITY', value: 'emits, does not compete' },
+    h2: 'Formus emits. It does not compete for your solver budget.',
+    body: 'The property that comes out of the confirmation gate compiles to whatever your flow already consumes. If you have a formal environment, Formus feeds it. If you do not, the deterministic checker runs the check itself. Either way the evidence object is identical, because the object is rendered from the certificate and not from the tool.',
+    solversLabel: 'CHECKING ENGINES',
+    solvers: ['z3', 'cvc5', 'lean', 'nuXmv', 'SPIN', 'soufflé'],
+    formatsLabel: 'EMITTED FORMATS',
+    formats: ['SVA', 'ACSL', 'TLA+', 'C assertions', 'native'],
+    note: 'And the formal environment you already own. Routing is a pure function of the property shape, it is recorded in the object, and the same property never lands on a different engine.',
+    kvl: {
+      h3: 'You never write KVL. That is the point.',
+      body: 'KVL is the intermediate representation every requirement compiles into, the way a compiler has an IR. It exists so that one confirmed property can target several engines and several certification output formats without being written several times. Engineers read it during confirmation. Nobody authors it.',
+    },
+  },
+
+  // ------------------------------------------------------------------- cta
   cta: {
     rule: { label: 'NEXT', value: 'technical' },
     eyebrow: 'SCOPING CALL · 45 MIN',
-    heading: 'Send us a requirement your certification body rejected.',
-    body: 'One requirement, in the words it was written in, plus the standard clause it has to satisfy. We will tell you whether Formus can carry it, and if it cannot, which part it cannot carry.',
+    heading: 'Send us a requirement your certification body sent back.',
+    body: 'One requirement, in the words it was written in, plus the clause it has to satisfy. We will tell you whether it is provable as written, and if it is not, which part of it is underspecified. That answer is useful to you whether or not you buy anything.',
     actions: [
       { label: 'Request access', href: '/demo/', kind: 'primary' as const },
       { label: 'Open a real Assurance Object', href: '/assurance-object/', kind: 'secondary' as const },
