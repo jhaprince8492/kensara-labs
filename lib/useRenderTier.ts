@@ -12,7 +12,6 @@ export interface RenderTierState {
 
 interface NetworkInformationLike {
   saveData?: boolean;
-  effectiveType?: string;
 }
 
 const BOT_PATTERN =
@@ -94,63 +93,6 @@ export function useRenderTier(): RenderTierState {
   }, []);
 
   return state;
-}
-
-// ---------------------------------------------------------------------------
-// Cinema tiers
-// ---------------------------------------------------------------------------
-
-export type CinemaTier = 'CINEMA_FULL' | 'CINEMA_LIGHT' | 'CINEMA_STILL';
-
-function hasCanvas2D(): boolean {
-  try {
-    return Boolean(document.createElement('canvas').getContext('2d'));
-  } catch {
-    return false;
-  }
-}
-
-function detectCinema(reducedMotion: boolean): CinemaTier {
-  // Disqualifying conditions first. CINEMA_STILL is a first-class experience,
-  // not a degraded one: identical copy, identical layout, composed posters.
-  if (reducedMotion) return 'CINEMA_STILL';
-  if (saveDataEnabled()) return 'CINEMA_STILL';
-  if (BOT_PATTERN.test(navigator.userAgent)) return 'CINEMA_STILL';
-  if (typeof createImageBitmap !== 'function') return 'CINEMA_STILL';
-  if (!hasCanvas2D()) return 'CINEMA_STILL';
-
-  const cores = navigator.hardwareConcurrency ?? 2;
-  if (cores < 2) return 'CINEMA_STILL';
-
-  const connection = (navigator as Navigator & { connection?: NetworkInformationLike })
-    .connection;
-  const effective = connection?.effectiveType;
-  if (effective === 'slow-2g' || effective === '2g') return 'CINEMA_STILL';
-  if (effective === '3g') return 'CINEMA_LIGHT';
-
-  if (cores < 4) return 'CINEMA_LIGHT';
-
-  return 'CINEMA_FULL';
-}
-
-/**
- * Cinema tier, decided once on mount and never revisited.
- *
- * A layout that reflows because the connection improved mid-read is worse than
- * either state, so this deliberately does not subscribe to connection changes.
- * Returns null until the check has run, so nothing canvas-shaped is requested
- * during server render or first paint.
- */
-export function useCinemaTier(): CinemaTier | null {
-  const [tier, setTier] = useState<CinemaTier | null>(null);
-
-  useEffect(() => {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    setTier(detectCinema(reduced));
-    // Deliberately no listener: the tier is fixed for the session.
-  }, []);
-
-  return tier;
 }
 
 /** Reduced-motion alone, for components that have no 3D but do have reveals. */

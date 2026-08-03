@@ -112,14 +112,11 @@
     text-wrap: balance;
   }
 
-  /* Visible focus on the dark ground. Non-negotiable.
-     The dark halo underneath keeps the ring visible over the brightest frame
-     of any act: a blue outline on a blue filament is not a focus indicator. */
+  /* Visible focus on the dark ground. Non-negotiable. */
   :focus-visible {
     outline: 2px solid var(--color-proof);
     outline-offset: 2px;
     border-radius: 1px;
-    box-shadow: 0 0 0 5px rgba(5, 7, 11, 0.92);
   }
 
   ::selection {
@@ -148,40 +145,6 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-ink-500);
-  }
-
-  /*
-   * The film layer.
-   *
-   * Sticky for the section's duration, then pulled behind the content with a
-   * negative margin so it pins without affecting layout and without a
-   * scroll-jacking library. The vh declarations are fallbacks for browsers that
-   * do not know svh; without them the layer would collapse to auto height.
-   */
-  .film-layer {
-    height: 100vh;
-    height: 100svh;
-    margin-bottom: -100vh;
-    margin-bottom: -100svh;
-  }
-
-  /*
-   * Text-block backdrop.
-   *
-   * Any block of body copy longer than three lines sits on this. The fallback
-   * is deliberately solid rather than transparent: where backdrop-filter is
-   * unsupported, the copy must still be readable over a frame.
-   */
-  .film-panel {
-    background: var(--color-slate-900);
-  }
-
-  @supports (backdrop-filter: blur(14px)) or (-webkit-backdrop-filter: blur(14px)) {
-    .film-panel {
-      background: color-mix(in oklab, var(--void) 78%, transparent);
-      -webkit-backdrop-filter: blur(14px) saturate(0.85);
-      backdrop-filter: blur(14px) saturate(0.85);
-    }
   }
 
   /* Every verifiable thing on the site is set in mono. */
