@@ -3,7 +3,6 @@ import { AssuranceCard } from '@/components/assurance/AssuranceCard';
 import { FidelityReport } from '@/components/formus/FidelityReport';
 import { WorkedChain } from '@/components/formus/WorkedChain';
 import { CTABlock } from '@/components/layout/CTABlock';
-import { PipelineStrip } from '@/components/pipeline/PipelineStrip';
 import { Eyebrow } from '@/components/primitives/Eyebrow';
 import { Prose } from '@/components/primitives/Prose';
 import { Reveal } from '@/components/primitives/Reveal';
@@ -90,17 +89,6 @@ export default async function FormusPage() {
           </Prose>
           <p className="mono mt-8 text-14 text-ink-400">{formus.bottleneck.readout}</p>
         </Reveal>
-      </Section>
-
-      {/* the pipeline */}
-      <Section label={formus.pipeline.rule.label} value={formus.pipeline.rule.value}>
-        <Reveal>
-          <h2 className="text-28 sm:text-40">{formus.pipeline.h2}</h2>
-          <p className="measure mt-5 text-17 text-ink-400">{formus.pipeline.body}</p>
-        </Reveal>
-        <div className="mt-10">
-          <PipelineStrip stages={formus.pipeline.stages} accent="proof" />
-        </div>
       </Section>
 
       {/* who decides */}

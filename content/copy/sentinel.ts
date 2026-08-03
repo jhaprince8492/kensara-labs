@@ -1,5 +1,3 @@
-import type { PipelineStage } from '@/components/pipeline/PipelineStrip';
-
 export const sentinel = {
   meta: {
     title: 'Sentinel',
@@ -59,62 +57,6 @@ export const sentinel = {
         honesty: 'enforced at the network layer',
       },
     ],
-  },
-
-  pipeline: {
-    rule: { label: 'PIPELINE', value: '8 stages · ordered' },
-    h2: 'Intercept to ledger.',
-    body: 'The same expandable structure as Formus, because it is one system and not two products in a trench coat.',
-    stages: [
-      {
-        name: 'Interceptor',
-        does: 'Catches the action before execution and refuses to forward it until a decision exists.',
-        emits: 'action envelope · caller identity',
-        worked: 'intercept payments.refund · caller agent:support-01',
-      },
-      {
-        name: 'Evidence manifest',
-        does: 'Assembles the facts the policy will need from the authoritative sources, and records how old each one is.',
-        emits: 'manifest · per-source freshness',
-        worked: 'OMS.status=delivered age=22m · CRM.address age=21d',
-      },
-      {
-        name: 'Policy compiler (offline)',
-        does: 'Compiles the policy pack into a decision structure ahead of time, so runtime does no parsing and no interpretation.',
-        emits: 'compiled pack · content hash',
-        worked: 'pack:fin-in-v3.1 · 4 rules · hash c81b04e2',
-      },
-      {
-        name: 'Policy engine (runtime)',
-        does: 'Evaluates the compiled pack against the manifest in fixed rule order.',
-        emits: 'per-rule trace',
-        worked: 'R-101 info · R-207 fail · R-311 fail · R-402 obligation',
-      },
-      {
-        name: 'Decision gate',
-        does: 'Resolves the trace to allow or deny, applying the fail posture for the action class.',
-        emits: 'verdict · deciding rule',
-        worked: 'DENY · deciding rule R-207 evidence_freshness',
-      },
-      {
-        name: 'Obligation enforcer',
-        does: 'Applies the conditions attached to an allow: notify, redact, cap, require a second approver, expire.',
-        emits: 'obligations · expiry',
-        worked: 'obligation: second approver required · expires in 15m',
-      },
-      {
-        name: 'Review workflow',
-        does: 'Routes held actions to the named queue with the manifest attached, so a human sees the evidence, not just the request.',
-        emits: 'review item · queue',
-        worked: 'queue:refund-escalation · 1 item · manifest attached',
-      },
-      {
-        name: 'Audit ledger',
-        does: 'Appends the decision to a hash-chained log that replays byte-identically.',
-        emits: 'ledger entry · decision id · prev hash',
-        worked: 'seq 88231.4 · d7c1a4… · prev 8c14ef2a · replay ✓',
-      },
-    ] satisfies PipelineStage[],
   },
 
   latency: {

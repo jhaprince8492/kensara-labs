@@ -1,4 +1,3 @@
-import type { PipelineStage } from '@/components/pipeline/PipelineStrip';
 import type { VerdictKind } from '@/components/primitives/VerdictChip';
 
 /**
@@ -88,63 +87,6 @@ export const formus = {
       'That step has never been automated. It is why formal verification stayed inside aerospace and silicon for fifty years, and it is not a solver problem. It is an authoring problem, and it is the layer Formus owns.',
     ],
     readout: 'requirement → property · still manual in every tool on the market',
-  },
-
-  // ------------------------------------------------------------- the chain
-  pipeline: {
-    rule: { label: 'PIPELINE', value: '8 stages · ordered' },
-    h2: 'From the requirements document to the signed object.',
-    body: 'Eight stages, genuinely ordered. A language model appears once, at stage two, where it drafts and has no authority.',
-    stages: [
-      {
-        name: 'Requirement intake',
-        does: 'Ingests the requirements document, normalises each requirement to a single testable statement, and assigns the identifier the evidence will be filed under.',
-        emits: 'requirement set · ids · source references',
-        worked: 'REQ-PMP-0114 · SRS v4.2 §5.5.1 · 38 requirements in scope',
-      },
-      {
-        name: 'Property drafting (advisory model)',
-        does: 'Proposes a formal property for the requirement. This is the only stage a language model touches, and its output is a proposal, not a decision.',
-        emits: 'candidate property · vocabulary gaps · confidence',
-        worked: 'draft: G !(arm(t1) & arm(t2))',
-      },
-      {
-        name: 'Confirmation gate',
-        does: 'Renders the proposal back in the engineer’s own vocabulary, not in logic notation, and requires a named human to approve or edit it. Nothing proceeds until they do.',
-        emits: 'confirmed property · approver identity · edit history',
-        worked: 'confirmed_by a.rege · 2 edits · property locked',
-      },
-      {
-        name: 'Compilation to KVL',
-        does: 'Compiles the confirmed property into the intermediate representation and selects the targets it will be emitted to.',
-        emits: 'compiled logic · target list · content hash',
-        worked: 'kvl/1.4 · targets: SVA, ACSL, native · hash c81b04e2',
-      },
-      {
-        name: 'Environment and assumption modelling',
-        does: 'Infers the assumptions the check needs about everything outside the unit under verification, then validates them against the interface contracts.',
-        emits: 'assumption set · validation result',
-        worked: 'assumptions: 14 inferred · 14 validated · 0 unstated',
-      },
-      {
-        name: 'Deterministic checking',
-        does: 'Checks the system against the compiled logic. No model, no sampling, no heuristic. Where the property fails, the checker returns the state that reaches the failure.',
-        emits: 'verdict · counter-example · location',
-        worked: 'VIOLATED · pump_ctl.c:214 · cycle 3 · both timers armed',
-      },
-      {
-        name: 'Fidelity scoring',
-        does: 'Mutates the design and re-checks, and tests whether the property constrained anything at all. This is how you find out the proof was worth having.',
-        emits: 'mutation kill ratio · vacuity flags · per-requirement status',
-        worked: 'mutation kill 47 of 52 · 1 property vacuous',
-      },
-      {
-        name: 'Evidence rendering',
-        does: 'Renders the assurance object from the certificate and binds it to the clause it is being submitted against. Same inputs, same bytes, on any machine.',
-        emits: 'assurance object · clause binding · content hash',
-        worked: 'IEC 62304 5.5 · sha-256 9f2c14a8… · replay ✓',
-      },
-    ] satisfies PipelineStage[],
   },
 
   // ----------------------------------------------------------- who decides
