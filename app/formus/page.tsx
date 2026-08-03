@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { AssuranceCard } from '@/components/assurance/AssuranceCard';
 import { FidelityReport } from '@/components/formus/FidelityReport';
-import { WorkedChain } from '@/components/formus/WorkedChain';
 import { CTABlock } from '@/components/layout/CTABlock';
 import { Eyebrow } from '@/components/primitives/Eyebrow';
 import { Prose } from '@/components/primitives/Prose';
@@ -139,16 +138,12 @@ export default async function FormusPage() {
         </Reveal>
       </Section>
 
-      {/* worked example, end to end */}
+      {/* worked outcomes */}
       <Section label={formus.worked.rule.label} value={formus.worked.rule.value}>
         <Reveal>
           <h2 className="text-28 sm:text-40">{formus.worked.h2}</h2>
           <p className="measure mt-5 text-17 text-ink-400">{formus.worked.body}</p>
         </Reveal>
-
-        <div className="mt-10">
-          <WorkedChain />
-        </div>
 
         <ul className="mt-12 grid gap-6 lg:grid-cols-2">
           {formus.worked.variants.map((variant, index) => (

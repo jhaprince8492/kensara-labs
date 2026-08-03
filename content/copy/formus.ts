@@ -167,60 +167,9 @@ export const formus = {
 
   // -------------------------------------------------------- worked example
   worked: {
-    rule: { label: 'WORKED EXAMPLE', value: 'one requirement · end to end' },
-    h2: 'One requirement, all the way through.',
-    body: 'A Class C infusion pump, the requirement as it was written in the specification document, and every artifact the chain produced from it.',
-    steps: [
-      {
-        label: 'REQUIREMENT · AS WRITTEN',
-        actor: 'SRS v4.2 §5.5.1',
-        content: 'The pump shall not arm both infusion timers within the same control cycle.',
-        mono: false,
-      },
-      {
-        label: 'PROPOSAL · ADVISORY MODEL',
-        actor: 'not authoritative',
-        content: 'G !(arm(t1) & arm(t2))',
-        mono: true,
-      },
-      {
-        label: 'CONFIRMATION · RENDERED BACK IN PLAIN ENGLISH',
-        actor: 'a.rege',
-        content:
-          'At no point in the run are both timers armed at the same time. Approved after two edits: "control cycle" was bound to the scheduler tick, not to the ISR.',
-        mono: false,
-      },
-      {
-        label: 'COMPILED LOGIC · KVL',
-        actor: 'kvl/1.4',
-        content: 'always !(arm[t1] && arm[t2]) @ tick',
-        mono: true,
-      },
-      {
-        label: 'ASSUMPTIONS · INFERRED AND VALIDATED',
-        actor: 'environment',
-        content: 'tick monotonic · ISR cannot preempt tick · 14 inferred · 14 validated',
-        mono: true,
-      },
-      {
-        label: 'CHECK · DETERMINISTIC',
-        actor: 'no model on this path',
-        content: 'PROVEN · exhaustive over the reachable space · 41ms · core 4 of 412',
-        mono: true,
-      },
-      {
-        label: 'FIDELITY',
-        actor: 'was it worth proving',
-        content: 'mutation kill 12 of 12 · not vacuous · property constrains the design',
-        mono: true,
-      },
-      {
-        label: 'EVIDENCE · SIGNED AND BOUND',
-        actor: 'IEC 62304 5.5',
-        content: 'assurance object · sha-256 9f2c14a8… · replay ✓',
-        mono: true,
-      },
-    ],
+    rule: { label: 'WORKED EXAMPLE', value: '2 outcomes' },
+    h2: 'Two outcomes on the same device.',
+    body: 'A Class C infusion pump and two of its requirements. One is broken, and the check hands you the state that reaches it and the line that causes it. One cannot be settled inside the budget, so no verdict is issued rather than a weak one.',
     variants: [
       {
         chip: 'VIOLATED' as const,
