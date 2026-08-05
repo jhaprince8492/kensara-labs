@@ -1,8 +1,9 @@
 'use client';
 
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { generateStates } from '@/lib/scenes/stateSpace';
 import type { RenderTier } from '@/lib/useRenderTier';
 
@@ -234,10 +235,14 @@ function Crystal({
 
     base.dispose();
 
+    // A metal reflects its surroundings, so at metalness near 1 with nothing to
+    // reflect it renders black. The environment below is what makes this read
+    // as machined metal; the roughness keeps it brushed rather than mirrored.
     const material = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#141B25'),
-      metalness: 0.92,
-      roughness: 0.16,
+      color: new THREE.Color('#20293A'),
+      metalness: 0.86,
+      roughness: 0.26,
+      envMapIntensity: 1.2,
       flatShading: true,
       side: THREE.DoubleSide,
     });
@@ -285,16 +290,84 @@ function Crystal({
   );
 }
 
+// ------------------------------------------------------- lighting environment
+
+/**
+ * A metallic surface is almost entirely reflection, so without something to
+ * reflect it is black no matter how many lights you add. This builds a small
+ * room, prefilters it, and hands it to the scene as an environment map. No
+ * external asset is fetched, which matters for a statically exported site.
+ */
+function StudioEnvironment() {
+  const gl = useThree((state) => state.gl);
+  const scene = useThree((state) => state.scene);
+
+  useEffect(() => {
+    const pmrem = new THREE.PMREMGenerator(gl);
+    const room = new RoomEnvironment();
+    const target = pmrem.fromScene(room, 0.04);
+    scene.environment = target.texture;
+
+    return () => {
+      scene.environment = null;
+      target.texture.dispose();
+      room.dispose();
+      pmrem.dispose();
+    };
+  }, [gl, scene]);
+
+  return null;
+}
+
+// ------------------------------------------------------------------ the camera
+
+/**
+ * The hero push, restored.
+ *
+ * Across the first viewport the camera moves into the cloud, which is the
+ * gesture that makes 128 of 14,412 land. Once the hero is behind you it eases
+ * back out so the assembling solid has room to compose.
+ */
+function CameraRig({
+  page,
+  hero,
+}: {
+  page: React.RefObject<number>;
+  hero: React.RefObject<number>;
+}) {
+  const camera = useThree((state) => state.camera);
+  const look = useMemo(() => new THREE.Vector3(), []);
+
+  useFrame(() => {
+    const push = easeInOutCubic(clamp01(hero.current ?? 0));
+    const retreat = easeInOutCubic(window01(page.current ?? 0, 0.1, 0.3));
+
+    camera.position.z = 40 - push * 22 + retreat * 24;
+    camera.position.x = push * 2.2 - retreat * 1.4;
+    camera.position.y = -push * 1.6 + retreat * 1.2;
+
+    // During the push the camera drifts toward a refuted point deep in the
+    // cloud rather than staying centred.
+    look.set(push * 3.4 * (1 - retreat), -push * 4.2 * (1 - retreat), 0);
+    camera.lookAt(look);
+  });
+
+  return null;
+}
+
 // ------------------------------------------------------------------ the scene
 
 export default function BackdropScene({
   tier,
   scroll,
+  hero,
 }: {
   tier: Exclude<RenderTier, 3>;
   scroll: React.RefObject<number>;
+  hero: React.RefObject<number>;
 }) {
-  const eased = useRef(0);
+  const easedPage = useRef(0);
+  const easedHero = useRef(0);
 
   return (
     <Canvas
@@ -305,19 +378,24 @@ export default function BackdropScene({
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
       resize={{ scroll: false, debounce: { scroll: 0, resize: 80 } }}
     >
-      <ambientLight intensity={0.45} />
-      <pointLight position={[14, 12, 16]} intensity={420} color={PROOF} distance={140} />
-      <pointLight position={[-16, -10, 12]} intensity={180} color="#ffffff" distance={140} />
+      <StudioEnvironment />
+
+      <ambientLight intensity={0.6} />
+      <pointLight position={[16, 14, 18]} intensity={900} color={PROOF} distance={160} />
+      <pointLight position={[-18, -10, 14]} intensity={500} color="#ffffff" distance={160} />
+      <directionalLight position={[6, 10, 12]} intensity={1.1} color="#cfd8e6" />
 
       <Stars count={tier === 1 ? 1500 : 500} />
-      <StateCloud count={tier === 1 ? 14412 : 3000} progress={eased} />
+      <StateCloud count={tier === 1 ? 14412 : 3000} progress={easedPage} />
 
       {/* Offset right on desktop so the sculpture never sits under the measure. */}
       <group position={[tier === 1 ? 11 : 8, 0, 0]}>
-        <Crystal detail={tier === 1 ? 1 : 0} progress={eased} />
+        <Crystal detail={tier === 1 ? 1 : 0} progress={easedPage} />
       </group>
 
-      <ScrollBridge from={scroll} to={eased} />
+      <CameraRig page={easedPage} hero={easedHero} />
+      <ScrollBridge from={scroll} to={easedPage} />
+      <ScrollBridge from={hero} to={easedHero} />
     </Canvas>
   );
 }

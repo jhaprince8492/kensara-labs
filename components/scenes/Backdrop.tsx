@@ -22,7 +22,10 @@ const BackdropScene = dynamic(() => import('./BackdropScene'), { ssr: false });
 export function Backdrop() {
   const { tier } = useRenderTier();
   const [armed, setArmed] = useState(false);
+  /** Fraction of the whole document. Drives the shard assembly. */
   const scroll = useRef(0);
+  /** Fraction of the first viewport. Drives the hero camera push. */
+  const hero = useRef(0);
 
   useEffect(() => {
     if (tier === null || tier === 3) return;
@@ -53,8 +56,10 @@ export function Backdrop() {
     const measure = () => {
       frame = 0;
       const doc = document.documentElement;
-      const range = doc.scrollHeight - window.innerHeight;
+      const viewport = window.innerHeight || 1;
+      const range = doc.scrollHeight - viewport;
       scroll.current = range > 0 ? Math.min(1, Math.max(0, window.scrollY / range)) : 0;
+      hero.current = Math.min(1, Math.max(0, window.scrollY / viewport));
     };
 
     const onScroll = () => {
@@ -84,7 +89,7 @@ export function Backdrop() {
 
       {live ? (
         <div className="absolute inset-0">
-          <BackdropScene tier={tier === 2 ? 2 : 1} scroll={scroll} />
+          <BackdropScene tier={tier === 2 ? 2 : 1} scroll={scroll} hero={hero} />
         </div>
       ) : null}
 
