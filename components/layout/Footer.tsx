@@ -3,7 +3,8 @@ import { site } from '@/content/copy/site';
 
 export function Footer() {
   return (
-    <footer className="border-t border-hairline">
+    // Positioned and opaque so it stays above the home page's fixed backdrop.
+    <footer className="relative z-10 border-t border-hairline bg-void">
       <div className="mx-auto max-w-[88rem] px-5 py-14 sm:px-8">
         <div className="grid gap-10 md:grid-cols-[1fr_auto_auto]">
           <div className="measure">

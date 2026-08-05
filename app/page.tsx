@@ -8,7 +8,7 @@ import { Eyebrow } from '@/components/primitives/Eyebrow';
 import { Prose } from '@/components/primitives/Prose';
 import { Reveal } from '@/components/primitives/Reveal';
 import { Section } from '@/components/primitives/Section';
-import { StateSpace } from '@/components/scenes/StateSpace';
+import { Backdrop } from '@/components/scenes/Backdrop';
 import { assuranceBody } from '@/content/data/assuranceObject';
 import { home } from '@/content/copy/home';
 import { canonicalJson, sha256Hex } from '@/lib/hash';
@@ -21,10 +21,13 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* One fixed scene behind the whole page: the state space at the top,
+          eighty shards converging into a single solid by the close. */}
+      <Backdrop />
+
+      <div className="relative z-10">
       {/* ------------------------------------------------ H1 · the state space */}
       <section className="relative flex min-h-[92vh] items-center overflow-hidden">
-        <StateSpace />
-
         <div className="relative mx-auto w-full max-w-[88rem] px-5 py-24 sm:px-8">
           <Eyebrow>{home.hero.eyebrow}</Eyebrow>
 
@@ -244,6 +247,7 @@ export default async function HomePage() {
           />
         </Reveal>
       </Section>
+      </div>
     </>
   );
 }
