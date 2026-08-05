@@ -93,14 +93,28 @@ export function Backdrop() {
         </div>
       ) : null}
 
-      {/* Legibility. The measure sits on the left, so the ground stays near
-          solid there and opens up on the right where the sculpture is. Body
-          text has to keep clearing 4.5:1 over whatever is behind it. */}
+      {/* Legibility, in two layers rather than one flat veil.
+          The measure sits in the left half, so that band stays near solid and
+          the right falls to a partial veil rather than clearing entirely.
+          Left-aligned copy in the right column, the matrix header and the
+          engine panels among it, sits directly over that zone, and body text
+          clearing 4.5:1 is a functional requirement rather than a preference.
+          The metal reads through it because the environment map gives it
+          specular range, not because the ground was made transparent. */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(90deg, var(--void) 0%, rgba(5,7,11,0.93) 30%, rgba(5,7,11,0.72) 58%, rgba(5,7,11,0.5) 100%)',
+            'linear-gradient(90deg, var(--void) 0%, rgba(5,7,11,0.95) 34%, rgba(5,7,11,0.78) 55%, rgba(5,7,11,0.6) 78%, rgba(5,7,11,0.52) 100%)',
+        }}
+      />
+      {/* Vignette. Holds the eye centre-right and stops the star bed reaching
+          the corners, where it reads as noise. */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(120% 105% at 68% 48%, transparent 0%, transparent 40%, rgba(5,7,11,0.55) 100%)',
         }}
       />
       <div

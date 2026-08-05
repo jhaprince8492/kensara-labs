@@ -49,6 +49,11 @@ function rng(seed: number): () => number {
 
 // --------------------------------------------------------------- the star bed
 
+/**
+ * The only element that persists across the whole page. It carries continuity
+ * between the two acts, so it is held far enough back to never compete: this
+ * is depth, not content.
+ */
 function Stars({ count }: { count: number }) {
   const geometry = useMemo(() => {
     const next = rng(0x57a2);
@@ -63,7 +68,7 @@ function Stars({ count }: { count: number }) {
 
   return (
     <points geometry={geometry} frustumCulled={false}>
-      <pointsMaterial color={INK} size={0.11} sizeAttenuation transparent opacity={0.42} depthWrite={false} />
+      <pointsMaterial color={INK} size={0.1} sizeAttenuation transparent opacity={0.26} depthWrite={false} />
     </points>
   );
 }
@@ -117,9 +122,11 @@ function StateCloud({
     if (!group.current) return;
     group.current.rotation.y = clock.getElapsedTime() * 0.018;
 
-    // The cloud owns the hero and then gets out of the way. The refuted points
-    // go with it, so red never persists as background decoration.
-    const fade = 1 - easeInOutCubic(window01(progress.current ?? 0, 0.04, 0.26));
+    // The cloud owns the hero alone and is fully gone before the solid has any
+    // presence. The two never share a frame at strength, which is the whole
+    // point: one idea per viewport. The refuted points leave with it, so red
+    // never persists as background decoration.
+    const fade = 1 - easeInOutCubic(window01(progress.current ?? 0, 0.06, 0.17));
     const base = [0.3, 0.85, 1];
     group.current.children.forEach((child, i) => {
       const material = (child as THREE.Points).material as THREE.PointsMaterial;
@@ -207,15 +214,18 @@ function Crystal({
       g.computeVertexNormals();
       geometries.push(g);
 
+      // Held to a coherent constellation rather than debris thrown past the
+      // lens. Anything beyond roughly 30 units clips the frame at this focal
+      // length and reads as chaos instead of as a form waiting to resolve.
       const scatter = centre
         .clone()
         .normalize()
-        .multiplyScalar(26 + next() * 30)
+        .multiplyScalar(17 + next() * 12)
         .add(
           new THREE.Vector3(
-            (next() - 0.5) * 12,
-            (next() - 0.5) * 12,
-            (next() - 0.5) * 12,
+            (next() - 0.5) * 7,
+            (next() - 0.5) * 7,
+            (next() - 0.5) * 7,
           ),
         );
 
@@ -245,6 +255,8 @@ function Crystal({
       envMapIntensity: 1.2,
       flatShading: true,
       side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0,
     });
 
     return { geometries, shards, material };
@@ -260,17 +272,36 @@ function Crystal({
 
   useFrame(({ clock }) => {
     if (!group.current) return;
-    const t = clock.getElapsedTime();
-    group.current.rotation.y = t * 0.085;
-    group.current.rotation.x = t * 0.042;
+    const page = clamp01(progress.current ?? 0);
 
-    const p = easeInOutCubic(clamp01(progress.current ?? 0));
+    // The solid does not exist while the hero is on screen. It is not drawn at
+    // all below the threshold, which also keeps 80 draw calls out of the most
+    // performance-sensitive viewport on the page.
+    const presence = easeInOutCubic(window01(page, 0.11, 0.24));
+    group.current.visible = presence > 0.002;
+    material.opacity = presence;
+    if (!group.current.visible) return;
+
+    // Enters slightly under scale, so it arrives rather than appears.
+    const scale = 0.94 + presence * 0.06;
+    group.current.scale.setScalar(scale);
+
+    // Assembly begins only after the handoff and resolves before the close.
+    const assemble = easeInOutCubic(window01(page, 0.2, 0.9));
+
+    // Rotation settles as the form resolves. Motion that comes to rest reads
+    // as an object; motion that never stops reads as a screensaver.
+    const t = clock.getElapsedTime();
+    const spin = 1 - 0.72 * assemble;
+    group.current.rotation.y = t * 0.085 * spin;
+    group.current.rotation.x = t * 0.042 * spin;
+
     for (let i = 0; i < meshes.current.length; i += 1) {
       const mesh = meshes.current[i];
       const shard = shards[i];
       if (!mesh || !shard) continue;
-      mesh.position.lerpVectors(shard.start, shard.end, p);
-      mesh.quaternion.slerpQuaternions(shard.startQ, shard.endQ, p);
+      mesh.position.lerpVectors(shard.start, shard.end, assemble);
+      mesh.quaternion.slerpQuaternions(shard.startQ, shard.endQ, assemble);
     }
   });
 
@@ -340,7 +371,9 @@ function CameraRig({
 
   useFrame(() => {
     const push = easeInOutCubic(clamp01(hero.current ?? 0));
-    const retreat = easeInOutCubic(window01(page.current ?? 0, 0.1, 0.3));
+    // Back out before the solid reaches strength, so the two acts hand over
+    // rather than collide.
+    const retreat = easeInOutCubic(window01(page.current ?? 0, 0.08, 0.24));
 
     camera.position.z = 40 - push * 22 + retreat * 24;
     camera.position.x = push * 2.2 - retreat * 1.4;
