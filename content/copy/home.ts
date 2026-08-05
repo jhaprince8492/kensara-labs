@@ -1,5 +1,3 @@
-import type { GlyphName } from '@/components/home/MatrixGlyph';
-
 /**
  * Home page copy. Text lives here, not in JSX, so a non-engineer can edit the
  * site without opening a component.
@@ -7,28 +5,6 @@ import type { GlyphName } from '@/components/home/MatrixGlyph';
  * No em dashes anywhere on this site. Where a sentence wants one it gets a
  * comma, a colon, a full stop, or a mono middot.
  */
-
-export interface MatrixRow {
-  glyph: GlyphName;
-  problem: {
-    name: string;
-    body: string;
-    /** The concrete failure. Mono, always visible, never behind a hover. */
-    cost: string;
-  };
-  solution: {
-    name: string;
-    body: string;
-    /** A real readout in the product's own vocabulary. */
-    readout: string;
-  };
-}
-
-export interface MatrixGroup {
-  eyebrow: string;
-  engine: 'formus' | 'sentinel';
-  rows: MatrixRow[];
-}
 
 export interface IndustryTile {
   name: string;
@@ -80,134 +56,6 @@ export const home = {
       caption: 'Five paths you can list. A space you cannot.',
       alt: 'A linear flowchart of five sequential steps morphs into a branching decision tree whose leaves continue past the frame.',
     },
-  },
-
-  // -------------------------------------------------------------- H3 matrix
-  matrix: {
-    rule: { label: 'PROBLEM SPACE', value: '8 problems · 2 engines' },
-    h2: 'The hard parts are not secrets. Here is each one, and what we do about it.',
-    body: 'Four of these are why formal verification stayed inside aerospace and silicon. Four are why agent governance is mostly a policy document. We have not solved all of them. We have made each one somebody’s job instead of nobody’s.',
-    columns: { problem: 'THE PROBLEM', solution: 'WHAT WE DO' },
-    closing: 'Eight problems. One artifact at the end of every one of them.',
-
-    groups: [
-      {
-        eyebrow: 'FORMUS · PROVING REQUIREMENTS',
-        engine: 'formus' as const,
-        rows: [
-          {
-            glyph: 'state-space' as const,
-            problem: {
-              name: 'State-space explosion',
-              body: 'The number of reachable states grows exponentially with design size. Complex datapaths and deep pipelines fail to converge in commercial tools, so teams fall back to sampling the space and hoping the gap was empty.',
-              cost: 'a mode transition is valid, and valid, and valid, and then unrecoverable, three inputs deep',
-            },
-            solution: {
-              name: 'Abstraction and decomposition',
-              body: 'Logic irrelevant to the property is abstracted away and the system is decomposed into parts that close independently. Proofs converge where whole-system tools time out, and the composition is itself checked.',
-              readout: 'PROVEN · exhaustive over the reachable space · 41ms',
-            },
-          },
-          {
-            glyph: 'brittleness' as const,
-            problem: {
-              name: 'Proof brittleness',
-              body: 'A minor code change or a solver upgrade breaks a proof established months ago, and someone rewrites it by hand. Verification decays quietly between releases, and the decay is invisible until an audit.',
-              cost: 'verification passes at sign-off and is stale by the first revision',
-            },
-            solution: {
-              name: 'Proof repair and change resilience',
-              body: 'Proofs are re-derived against the recorded design intent rather than re-authored from scratch, so a change adapts the proof instead of invalidating it. Every artifact is addressed by content hash, so you can see exactly what moved.',
-              readout: 're-derived · pinned toolchain · replay ✓',
-            },
-          },
-          {
-            glyph: 'expertise' as const,
-            problem: {
-              name: 'Expertise shortage',
-              body: 'Writing temporal logic properties and interpreting a proof that will not converge takes specialised mathematics that standard verification teams do not have. The one person who is fluent becomes the bottleneck, and when they leave the practice leaves with them.',
-              cost: '20 to 30 person-years to specify a codebase built in 2 to 4',
-            },
-            solution: {
-              name: 'Property assistant, with a confirmation gate',
-              body: 'Requirements in your own words become formal properties, counter-examples are explained in the vocabulary of the design, and a proof that will not close reports which part failed. The model drafts. A named engineer confirms. Only then does the deterministic checker run.',
-              readout: 'confirmed_by a.rege · 2 edits · spec locked',
-            },
-          },
-          {
-            glyph: 'environment' as const,
-            problem: {
-              name: 'Environment constraints',
-              body: 'Building accurate environmental assumptions takes extensive manual effort, and getting them wrong is worse than not having them. Too loose and you drown in false bug reports. Too tight and you have proven something about a system that does not exist.',
-              cost: 'three weeks of triage on failures the environment could never produce',
-            },
-            solution: {
-              name: 'Assumption inference and environment modelling',
-              body: 'Environmental assumptions are inferred from the interface contracts and the surrounding design, then validated against them, so false positives fall and closure arrives sooner. Every assumption a proof relied on is recorded in the artifact, where an assessor can challenge it.',
-              readout: 'assumptions: 14 inferred · 14 validated · 0 unstated',
-            },
-          },
-        ],
-      },
-      {
-        eyebrow: 'SENTINEL · PERMITTING ACTIONS',
-        engine: 'sentinel' as const,
-        rows: [
-          {
-            glyph: 'bypass' as const,
-            problem: {
-              name: 'The bypass problem',
-              body: 'An interceptor an agent can route around is theatre. A decorator only runs on the path that goes through it, and production is never one path. It is rarely adversarial: it is an engineer adding a second code path on an ordinary Tuesday.',
-              cost: 'the check was in place, and the action did not go through it',
-            },
-            solution: {
-              name: 'The gate holds the credentials',
-              body: 'The agent’s runtime has no key for the payment rail, the OMS or the CRM. Sentinel mints a short-lived credential scoped to one action, after the decision, backed by your own key management. Skipping the gate means having nothing to act with.',
-              readout: 'agent runtime · no credentials · gate holds keys',
-            },
-          },
-          {
-            glyph: 'staleness' as const,
-            problem: {
-              name: 'Evidence staleness',
-              body: 'The agent acts on a fact the authoritative source has since revised. For a reversible action that is an annoyance. For an irreversible one the money is gone before anyone reads the log.',
-              cost: 'a refund issued against an order the OMS already recorded as delivered',
-            },
-            solution: {
-              name: 'Freshness as a rule, fail-closed by action class',
-              body: 'Irreversible actions require the authoritative source to be current within a stated window, and the age of every piece of evidence is recorded at decision time. Fail-closed is the default for anything that cannot be undone.',
-              readout: 'DENY · evidence_age 22m exceeds 5m for IRREVERSIBLE',
-            },
-          },
-          {
-            glyph: 'registry' as const,
-            problem: {
-              name: 'Registry lag',
-              body: 'New tools appear faster than any registry updates. A gate that treats an unrecognised action as permitted gets weaker every time your platform team ships, and nobody notices until the thing it let through matters.',
-              cost: 'the tool that caused the incident was registered the week after',
-            },
-            solution: {
-              name: 'Unknown actions default to review',
-              body: 'An action the registry does not recognise is never a pass-through. It is held, routed to a named queue with its evidence manifest attached, and a human sees the evidence rather than just the request.',
-              readout: 'REVIEW · unregistered action · queue:policy-triage',
-            },
-          },
-          {
-            glyph: 'derivation' as const,
-            problem: {
-              name: 'No derivation',
-              body: 'Afterwards, “why did it do that” has no answer. A fluent answer with no derivation cannot be checked by anyone, which means nobody can sign it, which means the workflow never leaves the pilot.',
-              cost: 'a model states a tax position with total confidence and no citation',
-            },
-            solution: {
-              name: 'Every decision leaves a signed record',
-              body: 'The requirement, the specification it compiled to, the verdict and its certificate, and the regulatory clause it satisfies, bound into one object. It replays byte-identically on any machine and verifies without calling us.',
-              readout: 'decision id d7c1a4… · ledger seq 88231.4 · replay ✓',
-            },
-          },
-        ],
-      },
-    ] satisfies MatrixGroup[],
   },
 
   // ----------------------------------------------------------------- H4 turn

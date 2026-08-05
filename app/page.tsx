@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { AssuranceCard } from '@/components/assurance/AssuranceCard';
-import { ProblemMatrix } from '@/components/home/ProblemMatrix';
 import { ShiftDiagram } from '@/components/home/ShiftDiagram';
 import { TranslationBoundary } from '@/components/home/TranslationBoundary';
 import { CTABlock } from '@/components/layout/CTABlock';
@@ -105,20 +104,6 @@ export default async function HomePage() {
           <Reveal delay={60} className="self-center">
             <ShiftDiagram />
           </Reveal>
-        </div>
-      </Section>
-
-      {/* ------------------------------------------------ H3 · the problem matrix */}
-      <Section label={home.matrix.rule.label} value={home.matrix.rule.value}>
-        <Reveal>
-          <h2 className="max-w-[26ch] text-28 sm:text-40">{home.matrix.h2}</h2>
-          <Prose className="mt-7">
-            <p>{home.matrix.body}</p>
-          </Prose>
-        </Reveal>
-
-        <div className="mt-14">
-          <ProblemMatrix />
         </div>
       </Section>
 
